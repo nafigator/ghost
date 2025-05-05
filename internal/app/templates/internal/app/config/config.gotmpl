@@ -1,0 +1,50 @@
+// Package config provides app configuration.
+package config
+
+import (
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/ardanlabs/conf/v3"
+	"go.uber.org/zap"
+)
+
+const (
+	appName   = "{{ .Name }}"
+	cfgPrefix = "{{ upper .Name }}"
+)
+
+type Conf struct {
+	conf.Version
+	ShutdownTimeout time.Duration `conf:"default:10s,short:t,help:Timeout for graceful shutdown"`
+}
+
+// Init initializes application config.
+func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
+	var c string
+	var err error
+
+	cfg := Conf{
+		Version: conf.Version{
+			Build: build,
+			Desc:  appName,
+		},
+	}
+
+	if c, err = conf.Parse(cfgPrefix, &cfg); err != nil {
+		if errors.Is(err, conf.ErrHelpWanted) {
+			fmt.Println(c) //nolint:forbidigo // Need for raw output of help message
+		}
+
+		return nil, err
+	}
+
+	if c, err = conf.String(&cfg); err != nil {
+		return nil, err
+	}
+
+	log.Infof("Initial config:\n%s", c)
+
+	return &cfg, nil
+}

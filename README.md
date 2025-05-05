@@ -1,2 +1,2 @@
-# ghost
-Go Hi-level Open Service Template
+# GHOST
+Go High-level Open Service Templater
