@@ -1,0 +1,31 @@
+// Package app that implement application.
+package app
+
+import (
+	"runtime/debug"
+
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/config"
+)
+
+var build = "develop" //nolint:gochecknoglobals //ldd-flag
+
+// Run runs application.
+func Run(c *zap.Config, log *zap.SugaredLogger) error {
+	//var conf *config.Conf
+	var err error
+
+	if _, err = config.Init(build, log); err != nil {
+		return err
+	}
+
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		log.Debugf("Build info:\n%s", bi.String())
+	}
+
+	log.Info("{{ .Name }} start")
+	defer log.Info("{{ .Name }} shutdown")
+
+	return nil
+}

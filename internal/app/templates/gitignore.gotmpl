@@ -1,11 +1,9 @@
-# If you prefer the allow list template instead of the deny list, see community template:
-# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
-#
 # Binaries for programs and plugins
 bin/
 
-# Test binary, built with `go test -c`
-*.test
+# Popular Ides configs
+.idea/
+.vscode/
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
@@ -15,3 +13,9 @@ vendor/
 
 # Zap logger config
 config.yml
+
+# Coverage files
+cover.html
+
+# Docker compose overrides
+docker-compose.override.yml
