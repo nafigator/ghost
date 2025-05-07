@@ -7,8 +7,10 @@ permissions:
   contents: read
 
 on:
+  push:
+    branches: [ "main" ]
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '29 6 * * *'
 
 env:
   GOLANGCI_LINT_VERSION: 'v2.0.2'
