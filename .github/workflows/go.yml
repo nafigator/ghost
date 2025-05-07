@@ -8,6 +8,9 @@ permissions:
 
 on:
   pull_request:
+  push:
+    tags:
+      - '*'
 
 env:
   GOLANGCI_LINT_VERSION: 'v2.0.2'
