@@ -1,0 +1,52 @@
+package app
+
+import (
+	"context"
+	"sync"
+
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/container"
+)
+
+const (
+	graceSuccess = "%s shutdown complete"
+	graceFail    = "%s graceful shutdown did not complete in %v: %s"
+)
+
+func shutdown(di *container.Container, log *zap.SugaredLogger) {
+	var wg sync.WaitGroup
+
+	defer di.Cancel()
+
+	count := len(di.Closers)
+	if count == 0 {
+		return
+	}
+
+	wg.Add(count)
+
+	for name, c := range di.Closers {
+		go func(wg *sync.WaitGroup) {
+			var err error
+
+			defer log.Debugf(graceSuccess, name)
+			defer wg.Done()
+
+			ctx, cancel := context.WithTimeout(context.Background(), di.Conf.ShutdownTimeout)
+			defer cancel()
+
+			if err = c.Shutdown(ctx); err == nil {
+				return
+			}
+
+			log.Warnf(graceFail, name, di.Conf.ShutdownTimeout, err)
+
+			if err = c.Close(); err != nil {
+				log.Warn(err)
+			}
+		}(&wg)
+	}
+
+	wg.Wait()
+}

@@ -1,0 +1,24 @@
+package support
+
+import (
+	"net/http"
+	"runtime/debug"
+
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
+)
+
+const (
+	buildNotFound = "Build info not found"
+)
+
+// BuildInfo returns build info.
+func (h *Handler) BuildInfo(*http.Request, any) mux.Response {
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		return &buildInfo{bi: bi}
+	}
+
+	h.log.Warn(buildNotFound)
+
+	return e.New(e.NotFound)
+}

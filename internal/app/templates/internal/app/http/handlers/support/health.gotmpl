@@ -1,0 +1,43 @@
+// Package support provides handlers for support group.
+package support
+
+import (
+	"net/http"
+
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/config"
+	"{{ lower .GoModule }}/internal/app/container"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
+)
+
+type Handler struct {
+	conf    *config.Conf
+	log     *zap.SugaredLogger
+	logConf *zap.Config
+}
+
+// New creates new instance of healthcheck handler.
+func New(di *container.Container) *Handler {
+	return &Handler{
+		conf:    di.Conf,
+		log:     di.Log,
+		logConf: di.LogConf,
+	}
+}
+
+// Startup implements startup probe logic.
+func (h *Handler) Startup(*http.Request, any) mux.Response {
+	return new(ok)
+}
+
+// Readiness implements readiness probe logic.
+func (h *Handler) Readiness(*http.Request, any) mux.Response {
+	return e.New(e.NotImplemented)
+}
+
+// Liveness implements liveness probe logic.
+func (h *Handler) Liveness(*http.Request, any) mux.Response {
+	return e.New(e.NotImplemented)
+}

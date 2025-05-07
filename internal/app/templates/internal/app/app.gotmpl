@@ -2,30 +2,63 @@
 package app
 
 import (
-	"runtime/debug"
+	"os/signal"
+	"syscall"
 
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 
-	"{{ lower .GoModule }}/internal/app/config"
+	"{{ lower .GoModule }}/internal/app/container"
+	"{{ lower .GoModule }}/internal/app/http"
 )
 
 var build = "develop" //nolint:gochecknoglobals //ldd-flag
 
 // Run runs application.
 func Run(c *zap.Config, log *zap.SugaredLogger) error {
-	//var conf *config.Conf
 	var err error
+	var di *container.Container
 
-	if _, err = config.Init(build, log); err != nil {
+	srvErrors := make(chan error, 1)
+	defer close(srvErrors)
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Dependency Injection container
+	di, err = container.New(build, c, log)
+	if err != nil {
 		return err
 	}
 
-	if bi, ok := debug.ReadBuildInfo(); ok {
-		log.Debugf("Build info:\n%s", bi.String())
+	// -----------------------------------------------------------------------------------------------------------------
+	// GOMAXPROCS definitions
+	if _, err = maxprocs.Set(maxprocs.Logger(log.Debugf)); err != nil {
+		return err
 	}
 
 	log.Info("{{ .Name }} start")
 	defer log.Info("{{ .Name }} shutdown")
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// HTTP Servers startup
+	http.Init(di, srvErrors)
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Signal handling initialization
+	signal.Notify(di.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer signal.Stop(di.Interrupt)
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Shutdown
+	select {
+	case err = <-srvErrors:
+		shutdown(di, log)
+
+		return err
+	case s := <-di.Interrupt:
+		log.Infof("Received signal: %s", s)
+
+		shutdown(di, log)
+	}
 
 	return nil
 }

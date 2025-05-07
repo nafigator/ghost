@@ -17,6 +17,9 @@ const (
 
 type Conf struct {
 	conf.Version
+	AuxAddr         string        `conf:"default:0.0.0.0:8080,short:a,help:Auxiliary server host and port"`
+	ReadTimeout     time.Duration `conf:"default:5s,short:r,help:Timeout for reading request"`
+    WriteTimeout    time.Duration `conf:"default:5s,short:w,help:Timeout for response writing"`
 	ShutdownTimeout time.Duration `conf:"default:10s,short:t,help:Timeout for graceful shutdown"`
 }
 

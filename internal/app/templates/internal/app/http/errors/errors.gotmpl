@@ -1,0 +1,104 @@
+// Package errors provides predefined HTTP errors.
+package errors
+
+import (
+	"net/http"
+
+	"github.com/nafigator/http/mime"
+
+	"{{ lower .GoModule }}/internal/sdk/pointer"
+)
+
+const (
+	Undefined = iota
+	NotFound
+	InternalServerError
+	NotImplemented
+	InvalidLevel
+	SameLevel
+)
+
+const (
+	UndefinedMsg    = "Undefined error"
+	InvalidLevelMsg = "Invalid logger level: %s"
+	SameLevelMsg    = "Logger already has same level"
+)
+
+const (
+	levelParam = "level"
+)
+
+var errs = map[int]*Error{ //nolint:gochecknoglobals // Access from New() only.
+	Undefined: {
+		status:  http.StatusUnprocessableEntity,
+		Code:    Undefined,
+		Message: UndefinedMsg,
+	},
+	NotFound: {
+		status: http.StatusNotFound,
+		Code:   NotFound,
+	},
+	InternalServerError: {status: http.StatusInternalServerError},
+	NotImplemented:      {status: http.StatusNotImplemented},
+	InvalidLevel: {
+		Code:    InvalidLevel,
+		Message: InvalidLevelMsg,
+		Field:   pointer.Get(levelParam),
+	},
+	SameLevel: {
+		Code:    SameLevel,
+		Message: SameLevelMsg,
+		Field:   pointer.Get(levelParam),
+	},
+}
+
+func New(i int) *Error {
+	if e, ok := errs[i]; ok {
+		return e
+	}
+
+	return errs[Undefined]
+}
+
+type Error struct {
+	Field   *string `json:"field,omitempty"`
+	Message string  `json:"message"`
+	status  int
+	Code    int `json:"code"`
+}
+
+func (e *Error) Data() (any, string) {
+	return e, mime.JSON
+}
+
+func (e *Error) Status() int {
+	return e.status
+}
+
+// Errors JSON multi error.
+type Errors struct {
+	Errors []Error `json:"errors"`
+}
+
+func (m *Errors) Add(e *Error) *Errors {
+	m.Errors = append(m.Errors, *e)
+
+	return m
+}
+
+func (m *Errors) Data() (any, string) {
+	return m, mime.JSON
+}
+
+func (m *Errors) Status() int {
+	return http.StatusUnprocessableEntity
+}
+
+// IsEmpty checks if errors is empty.
+func (m *Errors) IsEmpty() bool {
+	if m == nil {
+		return true
+	}
+
+	return len(m.Errors) == 0
+}
