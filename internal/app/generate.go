@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	dirStrictMode = 0750
+	dirStrictMode  = 0750
+	fileStrictMode = 0640
 )
 
 // generate service code from templates.
@@ -39,7 +40,7 @@ func generate(c *config.Conf) error {
 			return err
 		}
 
-		if f, err = os.Create(t.file); err != nil {
+		if f, err = os.OpenFile(t.file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(fileStrictMode)); err != nil {
 			return err
 		}
 
@@ -56,7 +57,7 @@ func createDir(d string) error {
 		return nil
 	}
 
-	if err := os.MkdirAll(d, dirStrictMode); err != nil {
+	if err := os.MkdirAll(d, os.FileMode(dirStrictMode)); err != nil {
 		return err
 	}
 
