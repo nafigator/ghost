@@ -1,0 +1,61 @@
+// Package validators provides predefined HTTP validators.
+package validators
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/dimfeld/httptreemux/v5"
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/container"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+)
+
+const (
+	levelParam = "level"
+)
+
+type Validator struct {
+	log     *zap.SugaredLogger
+	logConf *zap.Config
+}
+
+func New(di *container.Container) *Validator {
+	return &Validator{
+		log:     di.Log,
+		logConf: di.LogConf,
+	}
+}
+
+func (v *Validator) ChangeLevel(r *http.Request) any {
+	rawLevel := httptreemux.ContextData(r.Context()).Params()[levelParam]
+
+	level, err := zap.ParseAtomicLevel(rawLevel)
+	if err != nil {
+		v.log.Warnf(e.InvalidLevelMsg, rawLevel)
+
+		return unprocessable(rawLevel)
+	}
+
+	if v.logConf.Level.String() == rawLevel {
+		return unchangeable()
+	}
+
+	return level
+}
+
+func unprocessable(lvl string) *e.Errors {
+	var errs e.Errors
+
+	err := e.New(e.InvalidLevel)
+	err.Message = fmt.Sprintf(e.InvalidLevelMsg, lvl)
+
+	return errs.Add(err)
+}
+
+func unchangeable() *e.Errors {
+	var errs e.Errors
+
+	return errs.Add(e.New(e.SameLevel))
+}

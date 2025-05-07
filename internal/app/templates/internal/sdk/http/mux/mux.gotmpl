@@ -1,0 +1,87 @@
+// Package mux provides HTTP routes multiplexer.
+package mux
+
+import (
+	"net/http"
+
+	"github.com/dimfeld/httptreemux/v5"
+	"go.uber.org/zap"
+)
+
+const (
+	respError = "respond error"
+)
+
+// Handler function definition.
+type Handler func(*http.Request, any) Response
+
+type validator func(*http.Request) any
+
+type validators map[string]validator
+
+// Response provides data and content type.
+type Response interface {
+	Status() int
+	Data() (data any, contentType string)
+}
+
+type Mux struct {
+	*httptreemux.ContextMux
+	log        *zap.SugaredLogger
+	validators validators
+	mw         []Middleware
+}
+
+// New creates multiplexer.
+func New(log *zap.SugaredLogger, mw ...Middleware) *Mux {
+	return &Mux{
+		ContextMux: httptreemux.NewContextMux(),
+		mw:         mw,
+		log:        log,
+		validators: make(map[string]validator),
+	}
+}
+
+// GET sets a handler function for a GET HTTP method and path pair to the application server mux.
+func (m *Mux) GET(path string, handler Handler, mw ...Middleware) {
+	wh := m.wrap(path, handler, mw)
+
+	m.Handler(http.MethodGet, path, wh)
+}
+
+// POST sets a handler function for a POST HTTP method and path pair to the application server mux.
+func (m *Mux) POST(path string, handler Handler, mw ...Middleware) {
+	wh := m.wrap(path, handler, mw)
+
+	m.Handler(http.MethodPost, path, wh)
+}
+
+// PUT sets a handler function for a PUT HTTP method and path pair to the application server mux.
+func (m *Mux) PUT(path string, handler Handler, mw ...Middleware) {
+	wh := m.wrap(path, handler, mw)
+
+	m.Handler(http.MethodPut, path, wh)
+}
+
+// DELETE sets a handler function for a DELETE HTTP method and path pair to the application server mux.
+func (m *Mux) DELETE(path string, handler Handler, mw ...Middleware) {
+	wh := m.wrap(path, handler, mw)
+
+	m.Handler(http.MethodDelete, path, wh)
+}
+
+func (m *Mux) wrap(path string, handler Handler, mw []Middleware) http.Handler {
+	h := wrapMiddleware(mw, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		v := m.validate(path, r)
+
+		if resp, ok := v.(Response); ok {
+			m.respond(w, r, resp)
+
+			return
+		}
+
+		m.respond(w, r, handler(r, v))
+	}))
+
+	return wrapMiddleware(m.mw, h)
+}

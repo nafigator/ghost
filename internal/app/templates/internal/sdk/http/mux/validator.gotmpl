@@ -1,0 +1,16 @@
+package mux
+
+import "net/http"
+
+// Validator adds validator for provided path.
+func (m *Mux) Validator(path string, v validator) {
+	m.validators[path] = v
+}
+
+func (m *Mux) validate(path string, r *http.Request) any {
+	if v, ok := m.validators[path]; ok {
+		return v(r)
+	}
+
+	return nil
+}

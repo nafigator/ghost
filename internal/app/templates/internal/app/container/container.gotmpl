@@ -1,0 +1,51 @@
+// Package container implements DI container.
+package container
+
+import (
+	"context"
+	"os"
+
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/config"
+)
+
+type closer interface {
+	// Shutdown must be called graceful app shutdown.
+	Shutdown(context.Context) error
+	// Close must be called if graceful shutdown returns error and there is needs to force close.
+	Close() error
+}
+
+// Container dependency injection container.
+type Container struct {
+	Ctx       context.Context
+	Cancel    context.CancelFunc
+	Conf      *config.Conf
+	Interrupt chan os.Signal
+	Log       *zap.SugaredLogger
+	LogConf   *zap.Config
+	Closers   map[string]closer
+	Build     string
+}
+
+// New creates new dependency injection container.
+func New(build string, logConf *zap.Config, log *zap.SugaredLogger) (*Container, error) {
+	conf, err := config.Init(build, log)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	return &Container{
+		Conf:      conf,
+		Ctx:       ctx,
+		Cancel:    cancel,
+		Build:     build,
+		Log:       log,
+		LogConf:   logConf,
+		Interrupt: make(chan os.Signal, 1),
+		Closers:   make(map[string]closer),
+	}, nil
+}

@@ -1,0 +1,40 @@
+package support
+
+import (
+	"net/http"
+
+	"go.uber.org/zap"
+
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
+)
+
+const (
+	invalidType = "invalid parameter type: %T"
+)
+
+// ChangeLevel implements dynamically log level change.
+func (h *Handler) ChangeLevel(_ *http.Request, p any) mux.Response {
+	level, ok := p.(zap.AtomicLevel)
+	if !ok {
+		h.log.Errorf(invalidType, p)
+
+		return e.New(e.InternalServerError)
+	}
+
+	prev := h.logConf.Level.String()
+
+	h.logConf.Level.SetLevel(level.Level())
+
+	return &changeResponse{
+		Prev: prev,
+		Curr: h.logConf.Level.String(),
+	}
+}
+
+// Level implements current log level info.
+func (h *Handler) Level(*http.Request, any) mux.Response {
+	return &levelResponse{
+		Level: h.logConf.Level.String(),
+	}
+}

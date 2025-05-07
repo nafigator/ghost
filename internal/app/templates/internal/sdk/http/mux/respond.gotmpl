@@ -1,0 +1,80 @@
+package mux
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+
+	"github.com/nafigator/http/headers"
+	"github.com/nafigator/http/mime"
+)
+
+const (
+	disconnected = "client disconnected, do not send response"
+	unsupported  = "unsupported response content type: %s"
+	invalidType  = "invalid data type: %T"
+	writeMsg     = "write: %w"
+)
+
+func (m *Mux) respond(w http.ResponseWriter, r *http.Request, resp Response) {
+	if err := write(r.Context(), w, resp); err != nil {
+		m.log.Errorln(respError, err)
+
+		return
+	}
+}
+
+// write sends a response to the client.
+func write(ctx context.Context, w http.ResponseWriter, resp Response) error {
+	// If the context has been canceled, it means the client is no longer
+	// waiting for a response.
+	if err := ctx.Err(); err != nil {
+		if errors.Is(err, context.Canceled) {
+			return errors.New(disconnected)
+		}
+
+		return err
+	}
+
+	status := resp.Status()
+
+	switch status {
+	case http.StatusNoContent, http.StatusInternalServerError, http.StatusNotFound, http.StatusNotImplemented:
+		w.WriteHeader(status)
+
+		return nil
+	}
+
+	data, ct := resp.Data()
+
+	w.Header().Set(headers.ContentType, ct)
+	w.WriteHeader(status)
+
+	switch ct {
+	case mime.JSON:
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			return err
+		}
+	case mime.Text, mime.HTML:
+		var v string
+		var ok bool
+
+		if v, ok = data.(string); !ok {
+			return fmt.Errorf(invalidType, data)
+		}
+
+		if len(v) == 0 {
+			return nil
+		}
+
+		if _, err := w.Write([]byte(v)); err != nil {
+			return fmt.Errorf(writeMsg, err)
+		}
+	default:
+		return fmt.Errorf(unsupported, ct)
+	}
+
+	return nil
+}
