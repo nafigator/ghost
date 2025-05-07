@@ -84,7 +84,7 @@ var (
 	validatorSrc string
 )
 
-func templates() tps {
+func templates() tps { //nolint:funlen  // This function supposed to be longer than check limit.
 	return tps{
 		{
 			name: "golangci",
