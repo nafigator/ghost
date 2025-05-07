@@ -8,7 +8,7 @@ permissions:
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: '*/10 * * * *'
 
 env:
   GOLANGCI_LINT_VERSION: 'v2.0.2'
