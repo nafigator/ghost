@@ -158,6 +158,12 @@ build: #? Build binary
 		-o $(DOCKER_MOUNT_POINT)/bin/{{ lower .Name }} \
 		$(DOCKER_MOUNT_POINT)/cmd/main.go
 
+trivy: #? Security checks for current gateway Go dependencies
+	@echo "Check Go project..."
+	@docker run --rm -ti \
+		"$(GO_DOCKER_PARAMS)" \
+		$(TRIVY_IMAGE) --cache-dir=/var/cache fs ./
+
 .PHONY: help
 help: #? Show this message
 	@printf "\033[34;01mApplication management:\033[0m\n"

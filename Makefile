@@ -66,6 +66,7 @@ export BUILD_TIME:=$(shell date +'%F %T %Z')
 export DOCKER_MOUNT_POINT:=/go/src/github.com/nafigator/$(PROJECT)
 export GO_IMAGE:=nafigat0r/go:1.24.1
 export LINTER_IMAGE:=nafigat0r/golangci-lint:2.0.2
+export TRIVY_IMAGE=aquasec/trivy:0.62.1
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -77,6 +78,7 @@ export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-e GOCACHE=/var/cache/go-build \
 	-e GOLANGCI_LINT_CACHE=/var/cache/golangci-lint \
 	-e CGO_ENABLED=0 \
+	-e GOAMD64=$(GOAMD64) \
 	-e SSH_AUTH_SOCK=/run/ssh-agent.sock \
 	-v $(SSH_AUTH_SOCK_PATH):/run/ssh-agent.sock \
 	-v $(HOME)/.ssh/config:/etc/ssh/ssh_config \
@@ -84,6 +86,7 @@ export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-v /etc/group:/etc/group:ro \
 	-v $(HOME)/.ssh/known_hosts:/etc/ssh/ssh_known_hosts \
 	-v $(HOME)/.gitconfig:/etc/gitconfig \
+	-v $(HOME)/.config:/var/config \
 	-v $(GOPATH)/pkg:/go/pkg:Z \
 	-v $(GOPATH)/mod:/go/mod:Z \
 	-v $(CURDIR):$(DOCKER_MOUNT_POINT) \
@@ -94,13 +97,6 @@ export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 
 DOCKER_RUN_INTERACTIVE:=docker run -ti --rm \
 	"$(GO_DOCKER_PARAMS)" \
-	-e GOAMD64=$(GOAMD64) \
-	$(GO_IMAGE)
-
-DOCKER_RUN_INTERACTIVE_OPENBSD:=docker run -ti --rm \
-	"$(GO_DOCKER_PARAMS)" \
-	-e GOAMD64=v1 \
-	-e GOOS=openbsd \
 	$(GO_IMAGE)
 
 DOCKER_RUN_DAEMON:=docker run --rm -d \
@@ -164,6 +160,12 @@ build: #? Build binary
 		-ldflags=$(LD_FLAGS) \
 		-o $(DOCKER_MOUNT_POINT)/bin/ghost \
 		$(DOCKER_MOUNT_POINT)/cmd/main.go
+
+trivy: #? Security checks for current gateway Go dependencies
+	@echo "Check Go project..."
+	@docker run --rm -ti \
+		"$(GO_DOCKER_PARAMS)" \
+		$(TRIVY_IMAGE) --cache-dir=/var/cache fs ./
 
 .PHONY: help
 help: #? Show this message
