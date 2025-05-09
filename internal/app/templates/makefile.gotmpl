@@ -60,6 +60,7 @@ ifndef GOCACHE
 endif
 
 $(shell test -d $(GOCACHE) || mkdir -p $(GOCACHE))
+$(shell test -d $(HOME)/.config || mkdir -p $(HOME)/.config)
 
 export BUILD_TIME:=$(shell date +'%F %T %Z')
 
