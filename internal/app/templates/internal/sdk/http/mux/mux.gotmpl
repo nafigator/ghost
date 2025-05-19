@@ -34,8 +34,26 @@ type Mux struct {
 
 // New creates multiplexer.
 func New(log *zap.SugaredLogger, mw ...Middleware) *Mux {
+	cm := httptreemux.NewContextMux()
+
+	cm.MethodNotAllowedHandler = func(w http.ResponseWriter, r *http.Request, m map[string]httptreemux.HandlerFunc) {
+		h := wrapMiddleware(mw, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			httptreemux.MethodNotAllowedHandler(w, r, m)
+		}))
+
+		h.ServeHTTP(w, r)
+	}
+
+	cm.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
+		h := wrapMiddleware(mw, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNotFound)
+		}))
+
+		h.ServeHTTP(w, r)
+	}
+
 	return &Mux{
-		ContextMux: httptreemux.NewContextMux(),
+		ContextMux: cm,
 		mw:         mw,
 		log:        log,
 		validators: make(map[string]validator),

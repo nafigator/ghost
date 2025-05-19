@@ -29,6 +29,12 @@ var (
 	//go:embed templates/makefile.gotmpl
 	makefileSrc string
 
+	//go:embed templates/compose.gotmpl
+	composeSrc string
+
+	//go:embed templates/zap.gotmpl
+	zapSrc string
+
 	//go:embed templates/internal/app/app.gotmpl
 	appSrc string
 
@@ -105,6 +111,16 @@ func templates() tps { //nolint:funlen  // This function supposed to be longer t
 			name: "makefile",
 			file: "Makefile",
 			src:  makefileSrc,
+		},
+		{
+			name: "compose",
+			file: "docker-compose.yml",
+			src:  composeSrc,
+		},
+		{
+			name: "zap",
+			file: "config.yml.orig",
+			src:  zapSrc,
 		},
 		{
 			name: "main",
