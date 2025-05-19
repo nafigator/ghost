@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  {{ lower .Name }}:
+    image: {{ lower .GoImage }}
+    container_name: {{ lower .Name }}
+    hostname: {{ lower .Name }}
+    user: ${GID}:${UID}
+    read_only: true
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /etc/passwd:/etc/passwd
+      - /etc/group:/etc/group
+      - ${ZAP_CONFIG_PATH}:/etc/zap/config.yml
+      - ${PWD}/bin/{{ lower .Name }}:/usr/local/sbin/{{ lower .Name }}
+    restart: unless-stopped
+    working_dir: /usr/local/sbin
+    entrypoint: /usr/local/sbin/{{ lower .Name }}
+    security_opt:
+      - no-new-privileges=true
+    ports:
+      - "0.0.0.0:${EXTERNAL_AUX_PORT}:${AUX_PORT}"

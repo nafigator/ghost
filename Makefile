@@ -43,6 +43,7 @@ $(shell test -e $(HOME)/.ssh/known_hosts || touch $(HOME)/.ssh/known_hosts)
 $(shell test -e $(HOME)/.giconfig || touch $(HOME)/.gitconfig)
 $(shell test -d $(GOPATH)/pkg || mkdir -p $(GOPATH)/pkg)
 $(shell test -d $(GOPATH)/mod || mkdir -p $(GOPATH)/mod)
+$(shell test -f $(ZAP_CONFIG_PATH) || cp $(ZAP_CONFIG_PATH).orig $(ZAP_CONFIG_PATH))
 
 # https://docs.docker.com/desktop/mac/networking/#ssh-agent-forwarding
 ifeq ($(PLATFORM),Darwin)

@@ -4,6 +4,9 @@
 export UID:=$(shell id -u)
 export GID:=$(shell id -g)
 export PROJECT:={{ lower .Name }}
+export EXTERNAL_AUX_PORT:=8080
+export AUX_PORT:=8080
+export ZAP_CONFIG_PATH:=./config.yml
 
 ifndef PROJECT_VERSION
 	PROJECT_VERSION:=$(shell git tag -l | tail -n 1)
@@ -14,6 +17,11 @@ ifndef PROJECT_VERSION
 	endif
 
 	export PROJECT_VERSION
+endif
+
+# If TZ not defined, all logs timestamp will be in MSK timezone
+ifndef TZ
+	export TZ:=Europe/Moscow
 endif
 
 ifndef PROJECT_REVISION
@@ -43,6 +51,7 @@ $(shell test -e $(HOME)/.ssh/known_hosts || touch $(HOME)/.ssh/known_hosts)
 $(shell test -e $(HOME)/.giconfig || touch $(HOME)/.gitconfig)
 $(shell test -d $(GOPATH)/pkg || mkdir -p $(GOPATH)/pkg)
 $(shell test -d $(GOPATH)/mod || mkdir -p $(GOPATH)/mod)
+$(shell test -f $(ZAP_CONFIG_PATH) || cp $(ZAP_CONFIG_PATH).orig $(ZAP_CONFIG_PATH))
 
 # https://docs.docker.com/desktop/mac/networking/#ssh-agent-forwarding
 ifeq ($(PLATFORM),Darwin)
@@ -67,6 +76,7 @@ export BUILD_TIME:=$(shell date +'%F %T %Z')
 export DOCKER_MOUNT_POINT:=/go/src/{{ lower .GoModule }}
 export GO_IMAGE:={{ lower .GoImage }}
 export LINTER_IMAGE:={{ lower .LinterImage }}
+export TRIVY_IMAGE=aquasec/trivy:0.62.1
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -111,13 +121,34 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 	--entrypoint='/bin/bash' \
 	$(GO_IMAGE)
 
-.PHONY: run
-run: #? Run project
-	@echo "Run project..."
-	@$(DOCKER_RUN_DAEMON) run $(DOCKER_MOUNT_POINT)/cmd/main.go
+.PHONY: build
+build: #? Build binary
+	@echo "Build binary..."
+	@echo "Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64)"
+	@$(DOCKER_RUN_INTERACTIVE) build \
+		-ldflags=$(LD_FLAGS) \
+		-o $(DOCKER_MOUNT_POINT)/bin/{{ lower .Name }} \
+		$(DOCKER_MOUNT_POINT)/cmd/main.go
+
+.PHONY: rebuild
+rebuild: build #? Rebuild {{ lower .Name }}
+	@echo "Rebuild and run {{ lower .Name }}..."
+	@docker-compose up -d --remove-orphans --no-deps --force-recreate --build {{ lower .Name }}
+	@docker-compose ps
+
+.PHONY: up
+up: build #? Up environment
+	@echo "Up environment..."
+	@docker-compose up -d --remove-orphans
+	@docker-compose ps
+
+.PHONY: down
+down: #? Down environment
+	@echo "Up environment..."
+	@docker-compose down
 
 .PHONY: dc
-dc: #? Docker Command
+dc: #? Run custom docker command from "command" env
 	@echo "Run docker command: $(command)"
 	@$(DOCKER_RUN_INTERACTIVE) $(command)
 
@@ -126,6 +157,10 @@ deps: #? Run go mod tidy and vendor
 	@echo "Run go mod tidy & vendor..."
 	@$(DOCKER_BASH_INTERACTIVE) -c "go mod tidy"
 	@$(DOCKER_BASH_INTERACTIVE) -c "go mod vendor"
+
+.PHONY: ps
+ps: #? Show containers status
+	@docker-compose ps
 
 .PHONY: tidy
 tidy: #? Run go mod tidy
@@ -150,16 +185,8 @@ fix-alignment: #? Fix linter alignment issues
 		"$(GO_DOCKER_PARAMS)" \
 		$(LINTER_IMAGE) run --enable-only govet --fix
 
-.PHONY: build
-build: #? Build binary
-	@echo "Build binary..."
-	@echo "Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64)"
-	@$(DOCKER_RUN_INTERACTIVE) build \
-		-ldflags=$(LD_FLAGS) \
-		-o $(DOCKER_MOUNT_POINT)/bin/{{ lower .Name }} \
-		$(DOCKER_MOUNT_POINT)/cmd/main.go
-
-trivy: #? Security checks for current gateway Go dependencies
+.PHONY: trivy
+trivy: #? Security checks for current {{ lower .Name }} Go dependencies
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
