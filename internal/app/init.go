@@ -2,16 +2,17 @@ package app
 
 import (
 	_ "embed"
+
+	"github.com/nafigator/ghost/internal/app/config"
 )
 
 type tp struct {
-	name string
 	dir  string
 	file string
 	src  string
 }
 
-type tps []tp
+type tps map[string]tp
 
 var (
 	//go:embed templates/cmd/main.gotmpl
@@ -29,8 +30,17 @@ var (
 	//go:embed templates/makefile.gotmpl
 	makefileSrc string
 
+	//go:embed templates/makefile-api.gotmpl
+	makefileAPISrc string
+
 	//go:embed templates/compose.gotmpl
 	composeSrc string
+
+	//go:embed templates/compose.override.gotmpl
+	composeOverrideSrc string
+
+	//go:embed templates/compose-api.override.gotmpl
+	composeOverrideAPISrc string
 
 	//go:embed templates/zap.gotmpl
 	zapSrc string
@@ -44,14 +54,23 @@ var (
 	//go:embed templates/internal/app/config/config.gotmpl
 	configSrc string
 
+	//go:embed templates/internal/app/config/config-api.gotmpl
+	configAPISrc string
+
 	//go:embed templates/internal/app/container/container.gotmpl
 	containerSrc string
 
 	//go:embed templates/internal/app/http/init.gotmpl
 	httpInitSrc string
 
+	//go:embed templates/internal/app/http/init-api.gotmpl
+	httpInitAPISrc string
+
 	//go:embed templates/internal/app/http/mux.gotmpl
 	httpMuxSrc string
+
+	//go:embed templates/internal/app/http/mux-api.gotmpl
+	httpMuxAPISrc string
 
 	//go:embed templates/internal/app/http/handlers/support/build.gotmpl
 	buildSrc string
@@ -67,6 +86,9 @@ var (
 
 	//go:embed templates/internal/app/http/handlers/support/version.gotmpl
 	versionSrc string
+
+	//go:embed templates/internal/app/http/handlers/api/index.gotmpl
+	indexAPISrc string
 
 	//go:embed templates/internal/app/http/validators/validators.gotmpl
 	validatorsSrc string
@@ -87,142 +109,164 @@ var (
 	validatorSrc string
 )
 
-func templates() tps { //nolint:funlen  // This function supposed to be longer than check limit.
+func templates(c *config.Conf) tps {
+	t := common()
+
+	if c.WithREST {
+		t["makefile"] = tp{
+			file: "Makefile",
+			src:  makefileAPISrc,
+		}
+
+		t["compose-override"] = tp{
+			file: "docker-compose.override.yml.dist",
+			src:  composeOverrideAPISrc,
+		}
+
+		t["config"] = tp{
+			dir:  "internal/app/config",
+			file: "internal/app/config/config.go",
+			src:  configAPISrc,
+		}
+
+		t["init"] = tp{
+			dir:  "internal/app/http",
+			file: "internal/app/http/init.go",
+			src:  httpInitAPISrc,
+		}
+
+		t["mux"] = tp{
+			dir:  "internal/app/http",
+			file: "internal/app/http/mux.go",
+			src:  httpMuxAPISrc,
+		}
+
+		t["index"] = tp{
+			dir:  "internal/app/http/handlers/api",
+			file: "internal/app/http/handlers/api/index.go",
+			src:  indexAPISrc,
+		}
+	}
+
+	return t
+}
+
+func common() tps { //nolint:funlen  // This function supposed to be longer than check limit.
 	return tps{
-		{
-			name: "golangci",
+		"golangci": {
 			file: ".golangci.yml",
 			src:  golangciSrc,
 		},
-		{
-			name: "gitignore",
+		"gitignore": {
 			file: ".gitignore",
 			src:  gitignoreSrc,
 		},
-		{
-			name: "gomod",
+		"gomod": {
 			file: "go.mod",
 			src:  gomodSrc,
 		},
-		{
-			name: "makefile",
+		"makefile": {
 			file: "Makefile",
 			src:  makefileSrc,
 		},
-		{
-			name: "compose",
+		"compose": {
 			file: "docker-compose.yml",
 			src:  composeSrc,
 		},
-		{
-			name: "zap",
-			file: "config.yml.orig",
+		"compose-override": {
+			file: "docker-compose.override.yml.dist",
+			src:  composeOverrideSrc,
+		},
+		"zap": {
+			file: "config.yml.dist",
 			src:  zapSrc,
 		},
-		{
-			name: "main",
+		"main": {
 			dir:  "cmd",
 			file: "cmd/main.go",
 			src:  mainSrc,
 		},
-		{
-			name: "app",
+		"app": {
 			dir:  "internal/app",
 			file: "internal/app/app.go",
 			src:  appSrc,
 		},
-		{
-			name: "shutdown",
+		"shutdown": {
 			dir:  "internal/app",
 			file: "internal/app/shutdown.go",
 			src:  shutdownSrc,
 		},
-		{
-			name: "config",
+		"config": {
 			dir:  "internal/app/config",
 			file: "internal/app/config/config.go",
 			src:  configSrc,
 		},
-		{
-			name: "container",
+		"container": {
 			dir:  "internal/app/container",
 			file: "internal/app/container/container.go",
 			src:  containerSrc,
 		},
-		{
-			name: "init",
+		"init": {
 			dir:  "internal/app/http",
 			file: "internal/app/http/init.go",
 			src:  httpInitSrc,
 		},
-		{
-			name: "mux",
+		"mux": {
 			dir:  "internal/app/http",
 			file: "internal/app/http/mux.go",
 			src:  httpMuxSrc,
 		},
-		{
-			name: "build",
+		"build": {
 			dir:  "internal/app/http/handlers/support",
 			file: "internal/app/http/handlers/support/build.go",
 			src:  buildSrc,
 		},
-		{
-			name: "health",
+		"health": {
 			dir:  "internal/app/http/handlers/support",
 			file: "internal/app/http/handlers/support/health.go",
 			src:  healthSrc,
 		},
-		{
-			name: "log",
+		"log": {
 			dir:  "internal/app/http/handlers/support",
 			file: "internal/app/http/handlers/support/log.go",
 			src:  logSrc,
 		},
-		{
-			name: "responses",
+		"responses": {
 			dir:  "internal/app/http/handlers/support",
 			file: "internal/app/http/handlers/support/responses.go",
 			src:  responsesSrc,
 		},
-		{
-			name: "version",
+		"version": {
 			dir:  "internal/app/http/handlers/support",
 			file: "internal/app/http/handlers/support/version.go",
 			src:  versionSrc,
 		},
-		{
-			name: "validators",
+		"validators": {
 			dir:  "internal/app/http/validators",
 			file: "internal/app/http/validators/validators.go",
 			src:  validatorsSrc,
 		},
-		{
-			name: "errors",
+		"errors": {
 			dir:  "internal/app/http/errors",
 			file: "internal/app/http/errors/errors.go",
 			src:  errorsSrc,
 		},
-		{
-			name: "middleware",
+		"middleware": {
 			dir:  "internal/sdk/http/mux",
 			file: "internal/sdk/http/mux/middleware.go",
 			src:  middlewareSrc,
 		},
-		{
-			name: "sdkmux",
+		"sdkmux": {
 			dir:  "internal/sdk/http/mux",
 			file: "internal/sdk/http/mux/mux.go",
 			src:  sdkMuxSrc,
 		},
-		{
-			name: "respond",
+		"respond": {
 			dir:  "internal/sdk/http/mux",
 			file: "internal/sdk/http/mux/respond.go",
 			src:  respondSrc,
 		},
-		{
-			name: "validator",
+		"validator": {
 			dir:  "internal/sdk/http/mux",
 			file: "internal/sdk/http/mux/validator.go",
 			src:  validatorSrc,

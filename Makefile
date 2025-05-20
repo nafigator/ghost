@@ -68,7 +68,7 @@ export BUILD_TIME:=$(shell date +'%F %T %Z')
 export DOCKER_MOUNT_POINT:=/go/src/github.com/nafigator/$(PROJECT)
 export GO_IMAGE:=nafigat0r/go:1.24.1
 export LINTER_IMAGE:=nafigat0r/golangci-lint:2.0.2
-export TRIVY_IMAGE=aquasec/trivy:0.62.1
+export TRIVY_IMAGE:=aquasec/trivy:0.62.1
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -101,20 +101,10 @@ DOCKER_RUN_INTERACTIVE:=docker run -ti --rm \
 	"$(GO_DOCKER_PARAMS)" \
 	$(GO_IMAGE)
 
-DOCKER_RUN_DAEMON:=docker run --rm -d \
-	"$(GO_DOCKER_PARAMS)" \
-	--name=$(PROJECT) \
-	$(GO_IMAGE)
-
 DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 	"$(GO_DOCKER_PARAMS)" \
 	--entrypoint='/bin/bash' \
 	$(GO_IMAGE)
-
-.PHONY: run
-run: #? Run project
-	@echo "Run project..."
-	@$(DOCKER_RUN_DAEMON) run $(DOCKER_MOUNT_POINT)/cmd/main.go
 
 .PHONY: dc
 dc: #? Docker Command
@@ -122,9 +112,8 @@ dc: #? Docker Command
 	@$(DOCKER_RUN_INTERACTIVE) $(command)
 
 .PHONY: deps
-deps: #? Run go mod tidy and vendor
-	@echo "Run go mod tidy & vendor..."
-	@$(DOCKER_BASH_INTERACTIVE) -c "go mod tidy"
+deps: tidy #? Run go mod tidy and vendor
+	@echo "Run go mod vendor..."
 	@$(DOCKER_BASH_INTERACTIVE) -c "go mod vendor"
 
 .PHONY: ps
@@ -155,7 +144,7 @@ fix-alignment: #? Fix linter alignment issues
 		$(LINTER_IMAGE) run --enable-only govet --fix
 
 .PHONY: build
-build: #? Build binary
+build: deps #? Build binary
 	@echo "Build binary..."
 	@echo "Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64)"
 	@$(DOCKER_RUN_INTERACTIVE) build \

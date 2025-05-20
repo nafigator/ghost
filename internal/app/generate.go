@@ -31,12 +31,12 @@ func generate(c *config.Conf) error {
 		"upper": strings.ToUpper,
 	}
 
-	for _, t := range templates() {
+	for name, t := range templates(c) {
 		if err = createDir(t.dir); err != nil {
 			return err
 		}
 
-		if tpl, err = template.New(t.name).Funcs(fn).Parse(t.src); err != nil {
+		if tpl, err = template.New(name).Funcs(fn).Parse(t.src); err != nil {
 			return err
 		}
 
