@@ -1,0 +1,27 @@
+package api
+
+import (
+	"net/http"
+
+	"go.uber.org/zap"
+
+	"{{ lower .GoModule }}/internal/app/config"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
+)
+
+type Handler struct {
+	conf    *config.Conf
+	log     *zap.SugaredLogger
+	logConf *zap.Config
+}
+
+// New creates new instance of healthcheck handler.
+func New() *Handler {
+	return &Handler{}
+}
+
+// Index implements index route logic.
+func (h *Handler) Index(*http.Request, any) mux.Response {
+	return e.New(e.NotImplemented)
+}

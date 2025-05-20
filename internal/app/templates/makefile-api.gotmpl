@@ -6,6 +6,8 @@ export GID:=$(shell id -g)
 export PROJECT:={{ lower .Name }}
 export EXTERNAL_AUX_PORT:=8080
 export AUX_PORT:=8080
+export EXTERNAL_API_PORT:=80
+export API_PORT:=80
 export ZAP_CONFIG_PATH:=./config.yml
 
 ifndef PROJECT_VERSION
