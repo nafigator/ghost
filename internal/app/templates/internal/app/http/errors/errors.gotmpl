@@ -5,8 +5,7 @@ import (
 	"net/http"
 
 	"github.com/nafigator/http/mime"
-
-	"{{ lower .GoModule }}/internal/sdk/pointer"
+	"github.com/nafigator/pointer"
 )
 
 const (
@@ -43,12 +42,12 @@ var errs = map[int]*Error{ //nolint:gochecknoglobals // Access from New() only.
 	InvalidLevel: {
 		Code:    InvalidLevel,
 		Message: InvalidLevelMsg,
-		Field:   pointer.Get(levelParam),
+		Field:   pointer.New(levelParam),
 	},
 	SameLevel: {
 		Code:    SameLevel,
 		Message: SameLevelMsg,
-		Field:   pointer.Get(levelParam),
+		Field:   pointer.New(levelParam),
 	},
 }
 

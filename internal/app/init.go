@@ -74,9 +74,6 @@ var (
 	//go:embed templates/internal/app/http/errors/errors.gotmpl
 	errorsSrc string
 
-	//go:embed templates/internal/sdk/pointer/pointer.gotmpl
-	pointerSrc string
-
 	//go:embed templates/internal/sdk/http/mux/middleware.gotmpl
 	middlewareSrc string
 
@@ -205,12 +202,6 @@ func templates() tps { //nolint:funlen  // This function supposed to be longer t
 			dir:  "internal/app/http/errors",
 			file: "internal/app/http/errors/errors.go",
 			src:  errorsSrc,
-		},
-		{
-			name: "pointer",
-			dir:  "internal/sdk/pointer",
-			file: "internal/sdk/pointer/pointer.go",
-			src:  pointerSrc,
 		},
 		{
 			name: "middleware",
