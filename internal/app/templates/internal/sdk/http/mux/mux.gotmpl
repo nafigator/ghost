@@ -45,7 +45,7 @@ func New(log *zap.SugaredLogger, mw ...Middleware) *Mux {
 	}
 
 	cm.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
-		h := wrapMiddleware(mw, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h := wrapMiddleware(mw, http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}))
 
