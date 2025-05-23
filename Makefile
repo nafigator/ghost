@@ -20,6 +20,10 @@ ifndef PROJECT_REVISION
 	export PROJECT_REVISION:=$(shell git log -n 1 --format=%h)
 endif
 
+ifndef IMAGE_TAG
+	export IMAGE_TAG=$(shell git tag --sort=version:refname | tail -n1 | sed -e 's/v//')
+endif
+
 ifndef GOPATH
 	export GOPATH:=$(HOME)/.local/go
 endif
@@ -151,6 +155,19 @@ build: deps #? Build binary
 		-ldflags=$(LD_FLAGS) \
 		-o $(DOCKER_MOUNT_POINT)/bin/ghost \
 		$(DOCKER_MOUNT_POINT)/cmd/main.go
+
+.PHONY: image
+image: #? Build docker image
+	@echo "Build docker image..."
+	@DOCKER_BUILDKIT=1 docker build \
+		--progress=plain \
+		--force-rm \
+		--no-cache \
+		--build-arg LD_FLAGS=$(LD_FLAGS) \
+		--build-arg PROJECT_REVISION=$(PROJECT_REVISION) \
+		--tag nafigat0r/ghost:$(IMAGE_TAG) \
+		--file .docker/Dockerfile .
+	@docker image prune -f --filter label=stage=builder
 
 trivy: #? Security checks for current gateway Go dependencies
 	@echo "Check Go project..."

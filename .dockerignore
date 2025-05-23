@@ -1,0 +1,11 @@
+/bin
+/.docker
+/.github
+.gitignore
+.golangci.yml
+.typos.toml
+config.yml
+Makefile
+README.md
+LICENSE
+SECURITY.md
