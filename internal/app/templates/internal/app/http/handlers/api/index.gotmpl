@@ -1,20 +1,14 @@
+// Package api provides handlers for REST API group.
 package api
 
 import (
 	"net/http"
 
-	"go.uber.org/zap"
-
-	"{{ lower .GoModule }}/internal/app/config"
-	e "{{ lower .GoModule }}/internal/app/http/errors"
-	"{{ lower .GoModule }}/internal/sdk/http/mux"
+	e "github.com/test/gateway/internal/app/http/errors"
+	"github.com/test/gateway/internal/sdk/http/mux"
 )
 
-type Handler struct {
-	conf    *config.Conf
-	log     *zap.SugaredLogger
-	logConf *zap.Config
-}
+type Handler struct{}
 
 // New creates new instance of healthcheck handler.
 func New() *Handler {
