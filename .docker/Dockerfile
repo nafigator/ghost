@@ -32,6 +32,6 @@ LABEL org.opencontainers.image.revision="$PROJECT_REVISION" \
 # Copy our static executable.
 COPY --from=builder /go/bin/ghost /usr/local/sbin/ghost
 
-WORKDIR /usr/local/sbin
+WORKDIR /var/ghost
 
 ENTRYPOINT ["/usr/local/sbin/ghost"]
