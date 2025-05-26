@@ -3,6 +3,43 @@
 
 Go High-level Open Service Templater
 
+## Usage
+
+```shell
+Usage: ghost [options...]
+
+OPTIONS
+  -g, --go-image          <string>    (default: nafigat0r/go:1.24.1)            Go docker image
+  -h, --help                                                                    display this help message
+  -l, --linter-image      <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
+  -m, --module-name       <string>    (default: github.com/test/test)           Go module name
+  -n, --name              <string>    (default: test)                           Project short name
+  -t, --shutdown-timeout  <duration>  (default: 10s)                            Timeout for graceful shutdown
+  -v, --version                                                                 display version
+  -r, --with-rest         <bool>      (default: false)                          Add HTTP server with REST API functionality
+
+ENVIRONMENT
+  GHOST_GO_IMAGE          <string>    (default: nafigat0r/go:1.24.1)            Go docker image
+  GHOST_LINTER_IMAGE      <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
+  GHOST_MODULE_NAME       <string>    (default: github.com/test/test)           Go module name
+  GHOST_NAME              <string>    (default: test)                           Project short name
+  GHOST_SHUTDOWN_TIMEOUT  <duration>  (default: 10s)                            Timeout for graceful shutdown
+  GHOST_WITH_REST         <bool>      (default: false)                          Add HTTP server with REST API functionality
+```
+
+#### Docker
+```shell
+docker run \
+    --user $(id -u):$(id -g) --rm -ti \
+    -v "$(pwd):/var/ghost" \
+    nafigat0r/ghost
+```
+
+## Versioning
+This software follows *"Semantic Versioning"* specifications. The signature of exported package functions is used
+as a public API. Read more on [SemVer.org][semver src].
+
+
 [License img]: https://img.shields.io/github/license/nafigator/ghost?color=teal
 [License src]: https://www.tldrlegal.com/license/mit-license
 [Release img]: https://img.shields.io/github/v/tag/nafigator/ghost?logo=github&color=teal&filter=!*/*
@@ -11,3 +48,4 @@ Go High-level Open Service Templater
 [Github main status badge]: https://github.com/nafigator/ghost/actions/workflows/daily.yml/badge.svg?branch=main
 [Conventional commits src]: https://conventionalcommits.org
 [Conventional commits badge]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-teal.svg
+[semver src]: http://semver.org
