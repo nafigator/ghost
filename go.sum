@@ -1,7 +1,7 @@
 bou.ke/monkey v1.0.2 h1:kWcnsrCNUatbxncxR/ThdYqbytgOIArtYWqcQLQzKLI=
 bou.ke/monkey v1.0.2/go.mod h1:OqickVX3tNx6t33n1xvtTtu85YN5s6cKwVug+oHMaIA=
-github.com/ardanlabs/conf/v3 v3.7.2 h1:s2VBuDJM6OQfR0erDuopiZ+dHUQVqGxZeLrTsls03dw=
-github.com/ardanlabs/conf/v3 v3.7.2/go.mod h1:XlL9P0quWP4m1weOVFmlezabinbZLI05niDof/+Ochk=
+github.com/ardanlabs/conf/v3 v3.8.0 h1:Mvv2wZJz8tIl705m5BU3ZRCP1V6TKY6qebA8i4sykrY=
+github.com/ardanlabs/conf/v3 v3.8.0/go.mod h1:XlL9P0quWP4m1weOVFmlezabinbZLI05niDof/+Ochk=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
