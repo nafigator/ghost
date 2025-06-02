@@ -21,7 +21,7 @@ ifndef PROJECT_REVISION
 endif
 
 ifndef IMAGE_TAG
-	export IMAGE_TAG=$(shell git tag --sort=version:refname | tail -n1 | sed -e 's/v//')
+	export IMAGE_TAG:=$(shell git tag --sort=version:refname | tail -n1 | sed -e 's/v//')
 endif
 
 ifndef GOPATH
