@@ -34,10 +34,10 @@ func (h *Handler) Startup(*http.Request, any) mux.Response {
 
 // Readiness implements readiness probe logic.
 func (h *Handler) Readiness(*http.Request, any) mux.Response {
-	return e.New(e.NotImplemented)
+	return new(ok)
 }
 
 // Liveness implements liveness probe logic.
 func (h *Handler) Liveness(*http.Request, any) mux.Response {
-	return e.New(e.NotImplemented)
+	return new(ok)
 }
