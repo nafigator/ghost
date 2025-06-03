@@ -20,11 +20,11 @@ RUN CGO_ENABLED=0 go build -a \
 ############################
 # STEP 2 build a small image
 ############################
-FROM scratch as production
-MAINTAINER Alexander Yancharuk <alex at itvault dot info>
+FROM scratch AS production
 
 ARG PROJECT_REVISION
 LABEL org.opencontainers.image.revision="$PROJECT_REVISION" \
+	org.opencontainers.image.authors="alex@itvault.info" \
 	org.opencontainers.image.vendor="Alexander Yancharuk" \
 	org.opencontainers.image.licenses=MIT \
 	org.opencontainers.image.source="https://github.com/nafigator/ghost/blob/main/.docker/Dockerfile"
