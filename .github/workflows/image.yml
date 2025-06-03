@@ -15,7 +15,7 @@ jobs:
 
       - name: Set up image tag
         run: |
-          echo "IMAGE_TAG=git tag --sort=version:refname | tail -n1 | sed -e 's/v//'" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$(git tag --sort=version:refname | tail -n1 | sed -e 's/v//')" >> "$GITHUB_ENV"
 
       - name: Build image
         run: make image
