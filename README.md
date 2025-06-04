@@ -17,7 +17,7 @@ GHOST creates in working dir fully functional microservice with basic functional
 Usage: ghost [options...]
 
 OPTIONS
-  -g, --go-image          <string>    (default: nafigat0r/go:1.24.1)            Go docker image
+  -g, --go-image          <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   -h, --help                                                                    display this help message
   -l, --linter-image      <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
   -m, --module-name       <string>    (default: github.com/test/test)           Go module name
@@ -27,7 +27,7 @@ OPTIONS
   -r, --with-rest         <bool>      (default: false)                          Add HTTP server with REST API functionality
 
 ENVIRONMENT
-  GHOST_GO_IMAGE          <string>    (default: nafigat0r/go:1.24.1)            Go docker image
+  GHOST_GO_IMAGE          <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   GHOST_LINTER_IMAGE      <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
   GHOST_MODULE_NAME       <string>    (default: github.com/test/test)           Go module name
   GHOST_NAME              <string>    (default: test)                           Project short name
