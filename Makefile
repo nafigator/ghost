@@ -74,6 +74,7 @@ export GO_IMAGE:=nafigat0r/go:1.24.3
 export LINTER_IMAGE:=nafigat0r/golangci-lint:2.0.2
 export TRIVY_IMAGE:=aquasec/trivy:0.63.0
 export GOVULNCHECK_IMAGE:=nafigat0r/govulncheck:1.1.4
+export SEMGREP_IMAGE:=semgrep/semgrep:1.123.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -171,7 +172,7 @@ image: #? Build docker image
 	@docker image prune -f --filter label=stage=builder
 
 .PHONY: trivy
-trivy: deps #? Security checks by trivy
+trivy: #? Security checks by trivy
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
@@ -182,8 +183,17 @@ govulncheck: deps #? Security checks by govulncheck
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
-		-v $(CURDIR):/var/govulncheck \
 		$(GOVULNCHECK_IMAGE) -show verbose ./...
+
+.PHONY: semgrep
+semgrep: #? Security checks by semgrep
+	@echo "Check Go project..."
+	@docker run --rm -ti \
+		-e XDG_CONFIG_HOME=/var/config \
+		-v $(HOME)/.config:/var/config \
+		-v $(CURDIR):/var/semgrep \
+		-w /var/semgrep \
+		$(SEMGREP_IMAGE) semgrep scan --config auto .
 
 .PHONY: help
 help: #? Show this message
