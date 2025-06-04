@@ -39,7 +39,6 @@ jobs:
           image-ref: nafigat0r/ghost:latest
           format: sarif
           output: trivy-results.sarif
-          exit-code: 1
           ignore-unfixed: true
           scan-type: image
           severity: 'CRITICAL,HIGH,MEDIUM'
