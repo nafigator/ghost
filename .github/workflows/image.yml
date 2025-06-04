@@ -7,6 +7,9 @@ on:
     tags:
       - "v*.*.*"
 
+env:
+  IMAGE_REF: 'nafigat0r/ghost'
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -25,10 +28,34 @@ jobs:
       - name: Set up tag
         run: echo "IMAGE_TAG=$(git tag --sort=version:refname | tail -n1 | sed -e 's/v//')" >> $GITHUB_ENV
 
-      - name: Build & push image
+      - name: Build image
         run: |
-          echo "Build with $IMAGE_TAG"
+          echo "Build tag $IMAGE_TAG"
           make image
-          docker image tag nafigat0r/ghost:$IMAGE_TAG nafigat0r/ghost:latest
-          docker push nafigat0r/ghost:$IMAGE_TAG
-          docker push nafigat0r/ghost:latest
+          docker image tag ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_REF }}:latest
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
+        with:
+          image-ref: ${{ env.IMAGE_REF }}:latest
+          exit-code: 1
+          format: sarif
+          output: trivy-results.sarif
+          ignore-unfixed: true
+          scan-type: image
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Upload trivy SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: trivy-results.sarif
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          category: trivy
+
+      - name: Push image
+        run: |
+          docker push ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}
+          docker push ${{ env.IMAGE_REF }}:latest
