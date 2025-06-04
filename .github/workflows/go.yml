@@ -50,7 +50,7 @@ jobs:
         run: echo modules=$(echo $(go list -m -json) | jq -s '.' | jq -c '[.[].Dir]') >> $GITHUB_OUTPUT
 
   tidy:
-    name: tidy
+    name: Tidy
     needs: detect-modules
     runs-on: ubuntu-latest
     strategy:
@@ -66,8 +66,8 @@ jobs:
         working-directory: ${{ matrix.modules }}
         run: go mod tidy --diff
 
-  checks:
-    name: checks
+  govulncheck:
+    name: Go vulnerabilities check
     needs: detect-modules
     runs-on: ubuntu-latest
     strategy:
@@ -99,7 +99,7 @@ jobs:
         uses: crate-ci/typos@b1a1ef3893ff35ade0cfa71523852a49bfd05d19 # v1.31.1
 
   golangci:
-    name: lint
+    name: Linter
     needs: detect-modules
     runs-on: ubuntu-latest
     strategy:
@@ -111,7 +111,7 @@ jobs:
         with:
           go-version: stable
           cache-dependency-path: 'go.sum'
-      - name: golangci-lint
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd # v7.0.0
         with:
           # Require: The version of golangci-lint to use.
