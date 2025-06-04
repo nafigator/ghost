@@ -79,6 +79,7 @@ export GO_IMAGE:={{ lower .GoImage }}
 export LINTER_IMAGE:={{ lower .LinterImage }}
 export TRIVY_IMAGE:=aquasec/trivy:0.63.0
 export GOVULNCHECK_IMAGE:={{ lower .GovulncheckImage }}
+export SEMGREP_IMAGE:=semgrep/semgrep:1.123.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -182,7 +183,7 @@ fix-alignment: #? Fix linter alignment issues
 		$(LINTER_IMAGE) run --enable-only govet --fix
 
 .PHONY: trivy
-trivy: deps #? Security checks for current {{ lower .Name }} Go dependencies
+trivy: #? Security checks for current {{ lower .Name }} Go dependencies
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
@@ -193,8 +194,17 @@ govulncheck: deps #? Security checks by govulncheck
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
-		-v $(CURDIR):/var/govulncheck \
 		$(GOVULNCHECK_IMAGE) -show verbose ./...
+
+.PHONY: semgrep
+semgrep: #? Security checks by semgrep
+	@echo "Check Go project..."
+	@docker run --rm -ti \
+		-e XDG_CONFIG_HOME=/var/config \
+		-v $(HOME)/.config:/var/config \
+		-v $(CURDIR):/var/semgrep \
+		-w /var/semgrep \
+		$(SEMGREP_IMAGE) semgrep scan --config auto .
 
 .PHONY: help
 help: #? Show this message

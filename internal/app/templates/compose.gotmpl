@@ -18,4 +18,4 @@ services:
     working_dir: /usr/local/sbin
     entrypoint: /usr/local/sbin/{{ lower .Name }}
     security_opt:
-      - no-new-privileges=true
+      - no-new-privileges:true

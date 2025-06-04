@@ -27,11 +27,14 @@ LABEL org.opencontainers.image.revision="$PROJECT_REVISION" \
 	org.opencontainers.image.authors="alex@itvault.info" \
 	org.opencontainers.image.vendor="Alexander Yancharuk" \
 	org.opencontainers.image.licenses=MIT \
-	org.opencontainers.image.source="https://github.com/nafigator/ghost/blob/main/.docker/Dockerfile"
+	org.opencontainers.image.source="https://github.com/nafigator/ghost/blob/${PROJECT_REVISION}/.docker/Dockerfile"
 
-# Copy our static executable.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
 COPY --from=builder /go/bin/ghost /usr/local/sbin/ghost
 
 WORKDIR /var/ghost
+
+USER nobody
 
 ENTRYPOINT ["/usr/local/sbin/ghost"]
