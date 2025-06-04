@@ -70,7 +70,7 @@ $(shell test -d $(HOME)/.config || mkdir -p $(HOME)/.config)
 export BUILD_TIME:=$(shell date +'%F %T %Z')
 
 export DOCKER_MOUNT_POINT:=/go/src/github.com/nafigator/$(PROJECT)
-export GO_IMAGE:=nafigat0r/go:1.24.1
+export GO_IMAGE:=nafigat0r/go:1.24.3
 export LINTER_IMAGE:=nafigat0r/golangci-lint:2.0.2
 export TRIVY_IMAGE:=aquasec/trivy:0.63.0
 export LD_FLAGS:='-s -w \
