@@ -16,6 +16,7 @@ on:
 
 env:
   GOLANGCI_LINT_VERSION: 'v2.0.2'
+  TRIVY_VERSION: '0.63.0'
 
 jobs:
   detect-modules:
@@ -70,6 +71,25 @@ jobs:
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@v0.0.0-20250106192626-d1f380186385 # v1.1.4
           govulncheck -show verbose ./...
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
+        with:
+          image-ref: nafigat0r/ghost:latest'
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: 1
+          ignore-unfixed: false
+          scan-type: image
+          severity: 'CRITICAL,HIGH,MEDIUM'
+      - name: Upload trivy SARIF file
+        if: always()
+        uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: trivy-results.sarif
+          # Optional category for the results
+          # Used to differentiate multiple results for one commit
+          category: trivy
 
   spelling:
     name: Spell Check with Typos
@@ -127,7 +147,7 @@ jobs:
           # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
           # install-mode: "goinstall"
 
-      - name: Upload SARIF file
+      - name: Upload linter SARIF file
         if: always()
         uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
         with:
