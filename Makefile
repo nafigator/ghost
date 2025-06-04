@@ -73,6 +73,7 @@ export DOCKER_MOUNT_POINT:=/go/src/github.com/nafigator/$(PROJECT)
 export GO_IMAGE:=nafigat0r/go:1.24.3
 export LINTER_IMAGE:=nafigat0r/golangci-lint:2.0.2
 export TRIVY_IMAGE:=aquasec/trivy:0.63.0
+export GOVULNCHECK_IMAGE:=nafigat0r/govulncheck:1.1.4
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
@@ -169,11 +170,20 @@ image: #? Build docker image
 		--file .docker/Dockerfile .
 	@docker image prune -f --filter label=stage=builder
 
-trivy: #? Security checks for current gateway Go dependencies
+.PHONY: trivy
+trivy: deps #? Security checks by trivy
 	@echo "Check Go project..."
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
 		$(TRIVY_IMAGE) --cache-dir=/var/cache fs ./
+
+.PHONY: govulncheck
+govulncheck: deps #? Security checks by govulncheck
+	@echo "Check Go project..."
+	@docker run --rm -ti \
+		"$(GO_DOCKER_PARAMS)" \
+		-v $(CURDIR):/var/govulncheck \
+		$(GOVULNCHECK_IMAGE) -show verbose ./...
 
 .PHONY: help
 help: #? Show this message

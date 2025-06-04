@@ -20,10 +20,11 @@ func generate(c *config.Conf) error {
 	var tpl *template.Template
 
 	vars := map[string]interface{}{
-		"GoModule":    c.ModuleName,
-		"Name":        c.Name,
-		"GoImage":     c.GoImage,
-		"LinterImage": c.LinterImage,
+		"GoModule":         c.ModuleName,
+		"Name":             c.Name,
+		"GoImage":          c.GoImage,
+		"GovulncheckImage": c.GovulncheckImage,
+		"LinterImage":      c.LinterImage,
 	}
 
 	fn := template.FuncMap{
