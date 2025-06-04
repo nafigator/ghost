@@ -4,8 +4,8 @@ package api
 import (
 	"net/http"
 
-	e "github.com/test/gateway/internal/app/http/errors"
-	"github.com/test/gateway/internal/sdk/http/mux"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
 )
 
 type Handler struct{}
