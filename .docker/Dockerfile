@@ -22,20 +22,9 @@ RUN CGO_ENABLED=0 go build -a \
 ############################
 FROM scratch AS image
 
-ARG PROJECT_REVISION
-ARG BUILD_TIME
-ARG IMAGE_TAG
-LABEL org.opencontainers.image.revision="$PROJECT_REVISION" \
-	org.opencontainers.image.created="$BUILD_TIME" \
-	org.opencontainers.image.title="ghost" \
-	org.opencontainers.image.ref.name="$IMAGE_TAG" \
-	org.opencontainers.image.version="$IMAGE_TAG" \
-	org.opencontainers.image.description="Go Hi-level Open Service Templater. Utiliy for creating Go microservice template in a workdir." \
-	org.opencontainers.image.authors="alex@itvault.info" \
-	org.opencontainers.image.vendor="Alexander Yancharuk" \
-	org.opencontainers.image.licenses=MIT \
-	org.opencontainers.image.url="https://github.com/nafigator/ghost/blob/${PROJECT_REVISION}/README.md" \
-	org.opencontainers.image.source="https://github.com/nafigator/ghost/blob/${PROJECT_REVISION}/.docker/Dockerfile"
+LABEL category=utility \
+	lang=go \
+	name=ghost
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group

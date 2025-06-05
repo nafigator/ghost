@@ -30,14 +30,20 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      - name: Set up tag
-        run: echo "IMAGE_TAG=$(git tag --sort=version:refname | tail -n1 | sed -e 's/v//')" >> $GITHUB_ENV
+      - name: Set up vars
+        run: |
+          echo "IMAGE_TAG=$(git tag --sort=version:refname | tail -n1 | sed -e 's/v//')" >> $GITHUB_ENV
+          echo "REVISION=$(git log -n 1 --format=%h)" >> $GITHUB_ENV
 
       - name: Build image
         run: |
           echo "Build tag $IMAGE_TAG"
           make image
           docker image tag ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }} ${{ env.IMAGE_REF }}:latest
+
+      - name: Set up build time
+        run: |
+          echo "BUILD_TIME=$(docker inspect ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }} | grep -oP '(?<=Created\": \")[^\"]*')" >> $GITHUB_ENV
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
@@ -64,3 +70,37 @@ jobs:
         run: |
           docker push ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}
           docker push ${{ env.IMAGE_REF }}:latest
+
+      - name: Crane setup
+        uses: imjasonh/setup-crane@31b88efe9de28ae0ffa220711af4b60be9435f6e # v0.4
+        with:
+          version: v0.20.5
+
+      - name: Annotate
+        run: |
+          crane mutate \
+            --annotation "org.opencontainers.image.revision=${{ env.REVISION }}" \
+            --annotation "org.opencontainers.image.created=${{ env.BUILD_TIME }}" \
+            --annotation "org.opencontainers.image.title=ghost" \
+            --annotation "org.opencontainers.image.ref.name=${{ env.IMAGE_TAG }}" \
+            --annotation "org.opencontainers.image.version=${{ env.IMAGE_TAG }}" \
+            --annotation "org.opencontainers.image.description=Go Hi-level Open Service Templater. Utility for creating Go microservice template in a workdir." \
+            --annotation "org.opencontainers.image.authors=alex@itvault.info" \
+            --annotation "org.opencontainers.image.vendor=Alexander Yancharuk" \
+            --annotation "org.opencontainers.image.licenses=MIT" \
+            --annotation "org.opencontainers.image.url=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/README.md" \
+            --annotation "org.opencontainers.image.source=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/.docker/Dockerfile" \
+            ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}
+          crane mutate \
+            --annotation "org.opencontainers.image.revision=${{ env.REVISION }}" \
+            --annotation "org.opencontainers.image.created=${{ env.BUILD_TIME }}" \
+            --annotation "org.opencontainers.image.title=ghost" \
+            --annotation "org.opencontainers.image.ref.name=${{ env.IMAGE_TAG }}" \
+            --annotation "org.opencontainers.image.version=${{ env.IMAGE_TAG }}" \
+            --annotation "org.opencontainers.image.description=Go Hi-level Open Service Templater. Utility for creating Go microservice template in a workdir." \
+            --annotation "org.opencontainers.image.authors=alex@itvault.info" \
+            --annotation "org.opencontainers.image.vendor=Alexander Yancharuk" \
+            --annotation "org.opencontainers.image.licenses=MIT" \
+            --annotation "org.opencontainers.image.url=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/README.md" \
+            --annotation "org.opencontainers.image.source=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/.docker/Dockerfile" \
+            ${{ env.IMAGE_REF }}:latest
