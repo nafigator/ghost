@@ -167,6 +167,8 @@ image: #? Build docker image
 		--no-cache \
 		--build-arg LD_FLAGS=$(LD_FLAGS) \
 		--build-arg PROJECT_REVISION=$(PROJECT_REVISION) \
+		--build-arg BUILD_TIME="$(BUILD_TIME)" \
+		--build-arg IMAGE_TAG=$(IMAGE_TAG) \
 		--tag nafigat0r/ghost:$(IMAGE_TAG) \
 		--file .docker/Dockerfile .
 	@docker image prune -f --filter label=stage=builder
