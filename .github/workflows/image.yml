@@ -95,7 +95,7 @@ jobs:
             --annotation "org.opencontainers.image.revision=${{ env.REVISION }}" \
             --annotation "org.opencontainers.image.created=${{ env.BUILD_TIME }}" \
             --annotation "org.opencontainers.image.title=ghost" \
-            --annotation "org.opencontainers.image.ref.name=${{ env.IMAGE_TAG }}" \
+            --annotation "org.opencontainers.image.ref.name=latest" \
             --annotation "org.opencontainers.image.version=${{ env.IMAGE_TAG }}" \
             --annotation "org.opencontainers.image.description=Go Hi-level Open Service Templater. Utility for creating Go microservice template in a workdir." \
             --annotation "org.opencontainers.image.authors=alex@itvault.info" \
