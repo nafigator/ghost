@@ -32,7 +32,7 @@ func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
 	cfg := Conf{
 		Version: conf.Version{
 			Build: build,
-			Desc:  appName,
+			Desc:  appName + " ({{ .Description }})",
 		},
 	}
 

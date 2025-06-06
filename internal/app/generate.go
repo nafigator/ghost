@@ -22,6 +22,7 @@ func generate(c *config.Conf) error {
 	vars := map[string]interface{}{
 		"GoModule":         c.ModuleName,
 		"Name":             c.Name,
+		"Description":      c.Description,
 		"GoImage":          c.GoImage,
 		"GovulncheckImage": c.GovulncheckImage,
 		"LinterImage":      c.LinterImage,
