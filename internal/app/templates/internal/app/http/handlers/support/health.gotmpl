@@ -4,25 +4,19 @@ package support
 import (
 	"net/http"
 
-	"go.uber.org/zap"
-
-	"{{ lower .GoModule }}/internal/app/config"
 	"{{ lower .GoModule }}/internal/app/container"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
 	"{{ lower .GoModule }}/internal/sdk/http/mux"
 )
 
 type Handler struct {
-	conf    *config.Conf
-	log     *zap.SugaredLogger
-	logConf *zap.Config
+	*container.Container
 }
 
 // New creates new instance of healthcheck handler.
 func New(di *container.Container) *Handler {
 	return &Handler{
-		conf:    di.Conf,
-		log:     di.Log,
-		logConf: di.LogConf,
+		Container: di,
 	}
 }
 
@@ -33,7 +27,11 @@ func (h *Handler) Startup(*http.Request, any) mux.Response {
 
 // Readiness implements readiness probe logic.
 func (h *Handler) Readiness(*http.Request, any) mux.Response {
-	return new(ok)
+	if h.ReadyAll {
+		return new(ok)
+	}
+
+	return e.New(e.ServiceUnavailable)
 }
 
 // Liveness implements liveness probe logic.

@@ -93,6 +93,12 @@ var (
 	//go:embed templates/internal/app/http/validators/validators.gotmpl
 	validatorsSrc string
 
+	//go:embed templates/internal/app/readiness/readiness.gotmpl
+	readinessSrc string
+
+	//go:embed templates/internal/app/readiness/readiness-api.gotmpl
+	readinessAPISrc string
+
 	//go:embed templates/internal/app/http/errors/errors.gotmpl
 	errorsSrc string
 
@@ -145,6 +151,12 @@ func templates(c *config.Conf) tps {
 			dir:  "internal/app/http/handlers/api",
 			file: "internal/app/http/handlers/api/index.go",
 			src:  indexAPISrc,
+		}
+
+		t["readiness"] = tp{
+			dir:  "internal/app/readiness",
+			file: "internal/app/readiness/readiness.go",
+			src:  readinessAPISrc,
 		}
 	}
 
@@ -250,6 +262,11 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			dir:  "internal/app/http/errors",
 			file: "internal/app/http/errors/errors.go",
 			src:  errorsSrc,
+		},
+		"readiness": {
+			dir:  "internal/app/readiness",
+			file: "internal/app/readiness/readiness.go",
+			src:  readinessSrc,
 		},
 		"middleware": {
 			dir:  "internal/sdk/http/mux",

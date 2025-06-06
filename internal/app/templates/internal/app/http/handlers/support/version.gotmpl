@@ -9,6 +9,6 @@ import (
 // Version returns version.
 func (h *Handler) Version(*http.Request, any) mux.Response {
 	return &versionResponse{
-		Version: h.conf.Build,
+		Version: h.Conf.Build,
 	}
 }

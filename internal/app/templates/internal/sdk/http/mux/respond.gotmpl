@@ -16,6 +16,7 @@ const (
 	unsupported  = "unsupported response content type: %s"
 	invalidType  = "invalid data type: %T"
 	writeMsg     = "write: %w"
+	waitTimeout  = "30"
 )
 
 func (m *Mux) respond(w http.ResponseWriter, r *http.Request, resp Response) {
@@ -42,6 +43,11 @@ func write(ctx context.Context, w http.ResponseWriter, resp Response) error {
 
 	switch status {
 	case http.StatusNoContent, http.StatusInternalServerError, http.StatusNotFound, http.StatusNotImplemented:
+		w.WriteHeader(status)
+
+		return nil
+	case http.StatusServiceUnavailable:
+		w.Header().Set(headers.RetryAfter, waitTimeout)
 		w.WriteHeader(status)
 
 		return nil

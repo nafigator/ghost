@@ -10,6 +10,7 @@ import (
 
 	"{{ lower .GoModule }}/internal/app/container"
 	"{{ lower .GoModule }}/internal/app/http"
+	"{{ lower .GoModule }}/internal/app/readiness"
 )
 
 var build = "develop" //nolint:gochecknoglobals //ldd-flag
@@ -28,6 +29,10 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 	if err != nil {
 		return err
 	}
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Readiness processing
+	go readiness.Check(di.Ready, &di.ReadyAll)
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// GOMAXPROCS definitions
