@@ -6,14 +6,26 @@ import (
 	"log" //nolint:depguard // Log errors through wrapper with zap log
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/nafigator/zapper/writer"
 
 	"{{ lower .GoModule }}/internal/app/container"
 )
 
+const (
+	aux         = "Aux server"
+	tcp         = "tcp"
+	timeout     = 100 * time.Millisecond
+	listening   = "App listening on %s"
+	notReady    = "HTTP-socket %s not ready"
+	closeUnable = "Unable to close TCP connection checking HTTP port: %s"
+)
+
 // Init initializes HTTP servers.
 func Init(di *container.Container, srvErrors chan<- error) {
+	go waitForSocket(di, di.Conf.AuxSocket)
+
 	startAuxServer(di, srvErrors)
 }
 
@@ -22,7 +34,7 @@ func startAuxServer(di *container.Container, srvErrors chan<- error) {
 		BaseContext: func(_ net.Listener) context.Context {
 			return di.Ctx
 		},
-		Addr:         di.Conf.AuxAddr,
+		Addr:         di.Conf.AuxSocket,
 		Handler:      auxMux(di),
 		ReadTimeout:  di.Conf.ReadTimeout,
 		WriteTimeout: di.Conf.WriteTimeout,
@@ -30,9 +42,28 @@ func startAuxServer(di *container.Container, srvErrors chan<- error) {
 	}
 
 	go func() {
-		di.Log.Infof("App listening on %s", srv.Addr)
 		srvErrors <- srv.ListenAndServe()
 	}()
 
-	di.Closers["Aux server"] = &srv
+	di.Closers[aux] = &srv
+}
+
+// waitForSocket checks socket availability.
+func waitForSocket(di *container.Container, socket string) {
+	for {
+		if conn, err := net.DialTimeout(tcp, socket, timeout); err == nil {
+			di.Ready <- struct{}{}
+			di.Log.Infof(listening, socket)
+
+			if e := conn.Close(); e != nil {
+				di.Log.Warnf(closeUnable, e)
+			}
+
+			return
+		}
+
+		di.Log.Debugf(notReady, socket)
+
+		time.Sleep(timeout)
+	}
 }

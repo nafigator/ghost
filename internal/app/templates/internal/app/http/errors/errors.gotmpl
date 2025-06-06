@@ -15,6 +15,7 @@ const (
 	NotImplemented
 	InvalidLevel
 	SameLevel
+	ServiceUnavailable
 )
 
 const (
@@ -49,6 +50,7 @@ var errs = map[int]*Error{ //nolint:gochecknoglobals // Access from New() only.
 		Message: SameLevelMsg,
 		Field:   pointer.New(levelParam),
 	},
+	ServiceUnavailable: {status: http.StatusServiceUnavailable},
 }
 
 func New(i int) *Error {

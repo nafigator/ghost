@@ -18,7 +18,7 @@ func (h *Handler) BuildInfo(*http.Request, any) mux.Response {
 		return &buildInfo{bi: bi}
 	}
 
-	h.log.Warn(buildNotFound)
+	h.Log.Warn(buildNotFound)
 
 	return e.New(e.NotFound)
 }

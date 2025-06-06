@@ -26,7 +26,9 @@ type Container struct {
 	Log       *zap.SugaredLogger
 	LogConf   *zap.Config
 	Closers   map[string]closer
+	Ready     chan struct{}
 	Build     string
+	ReadyAll  bool
 }
 
 // New creates new dependency injection container.
@@ -47,5 +49,6 @@ func New(build string, logConf *zap.Config, log *zap.SugaredLogger) (*Container,
 		LogConf:   logConf,
 		Interrupt: make(chan os.Signal, 1),
 		Closers:   make(map[string]closer),
+		Ready:     make(chan struct{}),
 	}, nil
 }

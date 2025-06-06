@@ -17,24 +17,24 @@ const (
 func (h *Handler) ChangeLevel(_ *http.Request, p any) mux.Response {
 	level, ok := p.(zap.AtomicLevel)
 	if !ok {
-		h.log.Errorf(invalidType, p)
+		h.Log.Errorf(invalidType, p)
 
 		return e.New(e.InternalServerError)
 	}
 
-	prev := h.logConf.Level.String()
+	prev := h.LogConf.Level.String()
 
-	h.logConf.Level.SetLevel(level.Level())
+	h.LogConf.Level.SetLevel(level.Level())
 
 	return &changeResponse{
 		Prev: prev,
-		Curr: h.logConf.Level.String(),
+		Curr: h.LogConf.Level.String(),
 	}
 }
 
 // Level implements current log level info.
 func (h *Handler) Level(*http.Request, any) mux.Response {
 	return &levelResponse{
-		Level: h.logConf.Level.String(),
+		Level: h.LogConf.Level.String(),
 	}
 }
