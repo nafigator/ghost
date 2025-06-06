@@ -17,5 +17,9 @@ services:
     restart: unless-stopped
     working_dir: /usr/local/sbin
     entrypoint: /usr/local/sbin/{{ lower .Name }}
+    healthcheck:
+      test: "curl --silent --fail --fail-early http://localhost:${AUX_PORT}/v1/liveness || exit 1"
+      interval: 30s
+      start_period: 2s
     security_opt:
       - no-new-privileges:true
