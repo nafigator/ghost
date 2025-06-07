@@ -146,14 +146,14 @@ down: #? Down environment
 	@docker-compose down
 
 .PHONY: dc
-dc: #? Run custom docker command from "command" env
+dc: #? Run custom docker command. Example "make dc command='ls -al'"
 	@echo "Run docker command: $(command)"
-	@$(DOCKER_RUN_INTERACTIVE) $(command)
+	@$(DOCKER_BASH_INTERACTIVE) $(command)
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy & vendor
 	@echo "Run go mod vendor..."
-	@$(DOCKER_BASH_INTERACTIVE) -c "go mod vendor"
+	@$(DOCKER_RUN_INTERACTIVE) mod vendor
 
 .PHONY: ps
 ps: #? Show containers status
