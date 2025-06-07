@@ -113,18 +113,14 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 	$(GO_IMAGE)
 
 .PHONY: dc
-dc: #? Docker Command
+dc: #? Docker Command. Example "make dc command='ls -al'"
 	@echo "Run docker command: $(command)"
-	@$(DOCKER_RUN_INTERACTIVE) $(command)
+	@$(DOCKER_BASH_INTERACTIVE) -c "$(command)"
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy and vendor
 	@echo "Run go mod vendor..."
-	@$(DOCKER_BASH_INTERACTIVE) -c "go mod vendor"
-
-.PHONY: ps
-ps: #? Show current running containers
-	@docker-compose ps
+	@$(DOCKER_RUN_INTERACTIVE) mod vendor
 
 .PHONY: tidy
 tidy: #? Run go mod tidy
