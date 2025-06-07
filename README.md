@@ -13,10 +13,15 @@ GHOST creates in working dir fully functional microservice with basic functional
 
 ## Usage
 
+<details>
+  <summary>Example</summary>
+
 ```shell
+$ ghost -h
 Usage: ghost [options...]
 
 OPTIONS
+  -d, --description        <string>    (default: Go microservice)                Project short description
   -g, --go-image           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   -c, --govulncheck-image  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   -h, --help                                                                     display this help message
@@ -28,6 +33,7 @@ OPTIONS
   -r, --with-rest          <bool>      (default: false)                          Add HTTP server with REST API functionality
 
 ENVIRONMENT
+  GHOST_DESCRIPTION        <string>    (default: Go microservice)                Project short description
   GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   GHOST_GOVULNCHECK_IMAGE  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
@@ -36,14 +42,20 @@ ENVIRONMENT
   GHOST_SHUTDOWN_TIMEOUT   <duration>  (default: 10s)                            Timeout for graceful shutdown
   GHOST_WITH_REST          <bool>      (default: false)                          Add HTTP server with REST API functionality
 ```
+</details>
 
 #### Docker
+
+<details>
+  <summary>Run via docker</summary>
+
 ```shell
 docker run \
     -u $(id -u):$(id -g) --rm -ti \
     -v "$(pwd):/var/ghost" \
     nafigat0r/ghost
 ```
+</details>
 
 ## Versioning
 This software follows *"Semantic Versioning"* specifications. The signature of exported package functions is used
