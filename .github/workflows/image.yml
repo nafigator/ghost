@@ -16,23 +16,8 @@ env:
   IMAGE_REF: 'nafigat0r/ghost'
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
-    permissions:
-      # Write permission is required to create a GitHub release
-      contents: write
-      pull-requests: read
-    steps:
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" \
-            --repo="$GITHUB_REPOSITORY" \
-            --generate-notes
-
   docker:
+    name: Create image
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -120,3 +105,20 @@ jobs:
             --annotation "org.opencontainers.image.url=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/README.md" \
             --annotation "org.opencontainers.image.source=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/.docker/Dockerfile" \
             ${{ env.IMAGE_REF }}:latest
+
+  release:
+    name: Create release
+    needs: docker
+    runs-on: ubuntu-latest
+    permissions:
+      # Write permission is required to create a GitHub release
+      contents: write
+    steps:
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$tag" \
+            --repo="$GITHUB_REPOSITORY" \
+            --generate-notes
