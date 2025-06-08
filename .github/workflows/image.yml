@@ -104,3 +104,9 @@ jobs:
             --annotation "org.opencontainers.image.url=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/README.md" \
             --annotation "org.opencontainers.image.source=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/.docker/Dockerfile" \
             ${{ env.IMAGE_REF }}:latest
+
+      - name: Release
+        uses: "marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0" #v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
