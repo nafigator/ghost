@@ -119,7 +119,7 @@ dc: #? Run custom docker command
 		exit 2; \
 	fi
 	@echo "Run docker command: $(cmd)"
-	@$(DOCKER_BASH_INTERACTIVE) -c "ls -al"
+	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy and vendor
