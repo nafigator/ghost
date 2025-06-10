@@ -113,18 +113,22 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 	$(GO_IMAGE)
 
 .PHONY: dc
-dc: #? Docker Command. Example "make dc command='ls -al'"
-	@echo "Run docker command: $(command)"
-	@$(DOCKER_BASH_INTERACTIVE) -c "$(command)"
+dc: #? Run custom docker command
+	$(info Run docker command: $(cmd))
+	@if [ -z "$(cmd)" ]; then \
+		echo "Use \"cmd\" env to define command. Example: make dc cmd='ls -al'"; \
+		exit 1; \
+	fi
+	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy and vendor
-	@echo "Run go mod vendor..."
+	$(info Run go mod vendor...)
 	@$(DOCKER_RUN_INTERACTIVE) mod vendor
 
 .PHONY: tidy
 tidy: #? Run go mod tidy
-	@echo "Run go mod tidy..."
+	$(info Run go mod tidy...)
 	@$(DOCKER_RUN_INTERACTIVE) mod tidy
 
 .PHONY: log
@@ -133,22 +137,22 @@ log: #? Container log
 
 .PHONY: lint
 lint: #? Run Go linter
-	@echo "Running golangci-lint..."
+	$(info Running golangci-lint...)
 	@docker run -ti --rm \
 		"$(GO_DOCKER_PARAMS)" \
 		$(LINTER_IMAGE) run
 
 .PHONY: fix-alignment
 fix-alignment: #? Fix linter alignment issues
-	@echo "Running golangci-lint..."
+	$(info Running golangci-lint...)
 	@docker run -ti --rm \
 		"$(GO_DOCKER_PARAMS)" \
 		$(LINTER_IMAGE) run --enable-only govet --fix
 
 .PHONY: build
 build: deps #? Build binary
-	@echo "Build binary..."
-	@echo "Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64)"
+	$(info Build binary...)
+	$(info Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64))
 	@$(DOCKER_RUN_INTERACTIVE) build \
 		-ldflags=$(LD_FLAGS) \
 		-o $(DOCKER_MOUNT_POINT)/bin/ghost \
@@ -156,7 +160,7 @@ build: deps #? Build binary
 
 .PHONY: image
 image: #? Build docker image
-	@echo "Build docker image..."
+	$(info Build docker image...)
 	@DOCKER_BUILDKIT=1 docker build \
 		--progress=plain \
 		--force-rm \
@@ -168,21 +172,21 @@ image: #? Build docker image
 
 .PHONY: trivy
 trivy: #? Security checks by trivy
-	@echo "Check Go project..."
+	$(info Check Go project...)
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
 		$(TRIVY_IMAGE) --cache-dir=/var/cache fs ./
 
 .PHONY: govulncheck
 govulncheck: deps #? Security checks by govulncheck
-	@echo "Check Go project..."
+	$(info Check Go project...)
 	@docker run --rm -ti \
 		"$(GO_DOCKER_PARAMS)" \
 		$(GOVULNCHECK_IMAGE) -show verbose ./...
 
 .PHONY: semgrep
 semgrep: #? Security checks by semgrep
-	@echo "Check Go project..."
+	$(info Check Go project...)
 	@docker run --rm -ti \
 		-e XDG_CONFIG_HOME=/var/config \
 		-v $(HOME)/.config:/var/config \
