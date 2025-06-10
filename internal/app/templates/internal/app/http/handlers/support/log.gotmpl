@@ -5,8 +5,9 @@ import (
 
 	"go.uber.org/zap"
 
-	e "{{ lower .GoModule }}/internal/app/http/errors"
-	"{{ lower .GoModule }}/internal/sdk/http/mux"
+	e "github.com/test/gateway/internal/app/http/errors"
+	"github.com/test/gateway/internal/app/http/handlers/support/response"
+	"github.com/test/gateway/internal/sdk/http/mux"
 )
 
 const (
@@ -26,7 +27,7 @@ func (h *Handler) ChangeLevel(_ *http.Request, p any) mux.Response {
 
 	h.LogConf.Level.SetLevel(level.Level())
 
-	return &changeResponse{
+	return &response.ChangeLevel{
 		Prev: prev,
 		Curr: h.LogConf.Level.String(),
 	}
@@ -34,7 +35,5 @@ func (h *Handler) ChangeLevel(_ *http.Request, p any) mux.Response {
 
 // Level implements current log level info.
 func (h *Handler) Level(*http.Request, any) mux.Response {
-	return &levelResponse{
-		Level: h.LogConf.Level.String(),
-	}
+	return &response.Level{Level: h.LogConf.Level.String()}
 }

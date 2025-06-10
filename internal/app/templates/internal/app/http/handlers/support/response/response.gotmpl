@@ -1,0 +1,52 @@
+// Package response provides structures for Aux API responses.
+package response
+
+import (
+	"runtime/debug"
+
+	"github.com/nafigator/http/mime"
+	"github.com/nafigator/http/response/status"
+)
+
+type Build struct {
+	*status.Ok
+	Info *debug.BuildInfo
+}
+
+func (b *Build) Data() (any, string) {
+	return b.Info.String(), mime.Text
+}
+
+type Ok struct{ *status.Ok }
+
+func (r *Ok) Data() (any, string) {
+	return "", mime.Text
+}
+
+type Level struct {
+	*status.Ok
+	Level string `json:"level"`
+}
+
+func (l *Level) Data() (any, string) {
+	return l, mime.JSON
+}
+
+type ChangeLevel struct {
+	*status.Ok
+	Prev string `json:"previous"`
+	Curr string `json:"current"`
+}
+
+func (c *ChangeLevel) Data() (any, string) {
+	return c, mime.JSON
+}
+
+type Version struct {
+	*status.Ok
+	Version string `json:"version"`
+}
+
+func (v *Version) Data() (any, string) {
+	return v, mime.JSON
+}
