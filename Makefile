@@ -116,8 +116,7 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 dc: #? Run custom docker command
 	$(info Run docker command: $(cmd))
 	@if [ -z "$(cmd)" ]; then \
-		echo "Use \"cmd\" env to define command. Example: make dc cmd='ls -al'"; \
-		exit 1; \
+		echo "Use \"cmd\" env to define command. Example: make dc cmd='ls -al'" >&2; \
 	fi
 	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
 
