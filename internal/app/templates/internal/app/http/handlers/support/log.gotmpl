@@ -5,9 +5,9 @@ import (
 
 	"go.uber.org/zap"
 
-	e "github.com/test/gateway/internal/app/http/errors"
-	"github.com/test/gateway/internal/app/http/handlers/support/response"
-	"github.com/test/gateway/internal/sdk/http/mux"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/app/http/handlers/support/response"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
 )
 
 const (

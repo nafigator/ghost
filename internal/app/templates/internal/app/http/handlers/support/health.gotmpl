@@ -4,10 +4,10 @@ package support
 import (
 	"net/http"
 
-	"github.com/test/gateway/internal/app/container"
-	e "github.com/test/gateway/internal/app/http/errors"
-	"github.com/test/gateway/internal/app/http/handlers/support/response"
-	"github.com/test/gateway/internal/sdk/http/mux"
+	"{{ lower .GoModule }}/internal/app/container"
+	e "{{ lower .GoModule }}/internal/app/http/errors"
+	"{{ lower .GoModule }}/internal/app/http/handlers/support/response"
+	"{{ lower .GoModule }}/internal/sdk/http/mux"
 )
 
 type Handler struct {
