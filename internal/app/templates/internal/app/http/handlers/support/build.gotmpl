@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	e "{{ lower .GoModule }}/internal/app/http/errors"
-	"{{ lower .GoModule }}/internal/sdk/http/mux"
+	e "github.com/test/gateway/internal/app/http/errors"
+	"github.com/test/gateway/internal/app/http/handlers/support/response"
+	"github.com/test/gateway/internal/sdk/http/mux"
 )
 
 const (
@@ -14,11 +15,11 @@ const (
 
 // BuildInfo returns build info.
 func (h *Handler) BuildInfo(*http.Request, any) mux.Response {
-	if bi, ok := debug.ReadBuildInfo(); ok {
-		return &buildInfo{bi: bi}
+	if info, ok := debug.ReadBuildInfo(); ok {
+		return &response.Build{Info: info}
 	}
 
 	h.Log.Warn(buildNotFound)
 
-	return e.New(e.NotFound)
+	return e.New(e.InternalServerError)
 }

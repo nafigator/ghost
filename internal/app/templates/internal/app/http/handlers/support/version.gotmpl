@@ -3,12 +3,11 @@ package support
 import (
 	"net/http"
 
-	"{{ lower .GoModule }}/internal/sdk/http/mux"
+	"github.com/test/gateway/internal/app/http/handlers/support/response"
+	"github.com/test/gateway/internal/sdk/http/mux"
 )
 
 // Version returns version.
 func (h *Handler) Version(*http.Request, any) mux.Response {
-	return &versionResponse{
-		Version: h.Conf.Build,
-	}
+	return &response.Version{Version: h.Conf.Build}
 }

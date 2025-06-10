@@ -81,8 +81,8 @@ var (
 	//go:embed templates/internal/app/http/handlers/support/log.gotmpl
 	logSrc string
 
-	//go:embed templates/internal/app/http/handlers/support/responses.gotmpl
-	responsesSrc string
+	//go:embed templates/internal/app/http/handlers/support/response/response.gotmpl
+	responseSrc string
 
 	//go:embed templates/internal/app/http/handlers/support/version.gotmpl
 	versionSrc string
@@ -244,9 +244,9 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  logSrc,
 		},
 		"responses": {
-			dir:  "internal/app/http/handlers/support",
-			file: "internal/app/http/handlers/support/responses.go",
-			src:  responsesSrc,
+			dir:  "internal/app/http/handlers/support/response",
+			file: "internal/app/http/handlers/support/response/response.go",
+			src:  responseSrc,
 		},
 		"version": {
 			dir:  "internal/app/http/handlers/support",

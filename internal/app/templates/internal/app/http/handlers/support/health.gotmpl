@@ -4,9 +4,10 @@ package support
 import (
 	"net/http"
 
-	"{{ lower .GoModule }}/internal/app/container"
-	e "{{ lower .GoModule }}/internal/app/http/errors"
-	"{{ lower .GoModule }}/internal/sdk/http/mux"
+	"github.com/test/gateway/internal/app/container"
+	e "github.com/test/gateway/internal/app/http/errors"
+	"github.com/test/gateway/internal/app/http/handlers/support/response"
+	"github.com/test/gateway/internal/sdk/http/mux"
 )
 
 type Handler struct {
@@ -22,13 +23,13 @@ func New(di *container.Container) *Handler {
 
 // Startup implements startup probe logic.
 func (h *Handler) Startup(*http.Request, any) mux.Response {
-	return new(ok)
+	return new(response.Ok)
 }
 
 // Readiness implements readiness probe logic.
 func (h *Handler) Readiness(*http.Request, any) mux.Response {
 	if h.ReadyAll {
-		return new(ok)
+		return new(response.Ok)
 	}
 
 	return e.New(e.ServiceUnavailable)
@@ -36,5 +37,5 @@ func (h *Handler) Readiness(*http.Request, any) mux.Response {
 
 // Liveness implements liveness probe logic.
 func (h *Handler) Liveness(*http.Request, any) mux.Response {
-	return new(ok)
+	return new(response.Ok)
 }
