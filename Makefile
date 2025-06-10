@@ -114,11 +114,12 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 
 .PHONY: dc
 dc: #? Run custom docker command
-	$(info Run docker command: $(cmd))
 	@if [ -z "$(cmd)" ]; then \
 		echo "Use \"cmd\" env to define command. Example: make dc cmd='ls -al'" >&2; \
+		exit 2; \
 	fi
-	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
+	@echo "Run docker command: $(cmd)"
+	@$(DOCKER_BASH_INTERACTIVE) -c "ls -al"
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy and vendor
