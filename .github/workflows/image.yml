@@ -1,9 +1,8 @@
 name: Image
 
 permissions:
-  contents: read
+  contents: write
   security-events: write
-  actions: read
 
 on:
   workflow_dispatch:
@@ -106,19 +105,16 @@ jobs:
             --annotation "org.opencontainers.image.source=https://github.com/nafigator/ghost/blob/${{ env.REVISION }}/.docker/Dockerfile" \
             ${{ env.IMAGE_REF }}:latest
 
-  release:
-    name: Create release
-    needs: docker
-    runs-on: ubuntu-latest
-    permissions:
-      # Write permission is required to create a GitHub release
-      contents: write
-    steps:
       - name: Create release
         env:
+          GOOS: linux
+          GOARCH: amd64
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
         run: |
-          gh release create "$tag" \
+          docker cp "$(docker create ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}):/usr/local/sbin/ghost" - \
+            | gzip -9 > /tmp/${{ env.GOOS }}-${{ env.GOARCH }}.tar.gz
+          gh release create "$TAG" \
             --repo="$GITHUB_REPOSITORY" \
-            --generate-notes
+            --generate-notes \
+            "/tmp/${{ env.GOOS }}-${{ env.GOARCH }}.tar.gz"

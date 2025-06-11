@@ -55,6 +55,11 @@ ifeq ($(PLATFORM),Darwin)
 	export SSH_AUTH_SOCK_PATH:=/run/host-services/ssh-auth.sock
 else
 	export CACHE_DIR:=$(HOME)/.cache
+
+	ifndef SSH_AUTH_SOCK
+		export SSH_AUTH_SOCK:=/run/ssh-agent.sock
+	endif
+
 	export SSH_AUTH_SOCK_PATH:=$(SSH_AUTH_SOCK)
 endif
 
@@ -89,11 +94,11 @@ export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-e GOAMD64=$(GOAMD64) \
 	-e SSH_AUTH_SOCK=/run/ssh-agent.sock \
 	-v $(SSH_AUTH_SOCK_PATH):/run/ssh-agent.sock \
-	-v $(HOME)/.ssh/config:/etc/ssh/ssh_config \
+	-v $(HOME)/.ssh/config:/etc/ssh/ssh_config:ro \
 	-v /etc/passwd:/etc/passwd:ro \
 	-v /etc/group:/etc/group:ro \
-	-v $(HOME)/.ssh/known_hosts:/etc/ssh/ssh_known_hosts \
-	-v $(HOME)/.gitconfig:/etc/gitconfig \
+	-v $(HOME)/.ssh/known_hosts:/etc/ssh/ssh_known_hosts:ro \
+	-v $(HOME)/.gitconfig:/etc/gitconfig:ro \
 	-v $(HOME)/.config:/var/config \
 	-v $(GOPATH)/pkg:/go/pkg:Z \
 	-v $(GOPATH)/mod:/go/mod:Z \

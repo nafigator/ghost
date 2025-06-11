@@ -1,37 +1,44 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: Go
+name: PR
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ "main" ]
-  schedule:
-    - cron: '29 6 * * *'
+  pull_request:
 
 env:
   GOLANGCI_LINT_VERSION: 'v2.0.2'
-  TRIVY_VERSION: '0.63.0'
   GOVULNCHECK_VERSION: 'v1.1.4'
 
 jobs:
-  spelling:
-    name: Spell Check with Typos
+  # JOB to run change detection
+  changes:
     runs-on: ubuntu-latest
+    # Required permissions
+    permissions:
+      pull-requests: read
+    # Set job outputs to values from filter step
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
     steps:
-      - name: Checkout Actions Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Spell Check Repo
-        uses: crate-ci/typos@b1a1ef3893ff35ade0cfa71523852a49bfd05d19 # v1.31.1
+      # For pull requests it's not necessary checkout the code
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '.golangci.yml'
 
   detect-modules:
     runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
     outputs:
       modules: ${{ steps.set-modules.outputs.modules }}
     steps:
@@ -83,6 +90,15 @@ jobs:
           go-version: ${{ matrix.go-version }}
           vulncheck-version: ${{ env.GOVULNCHECK_VERSION }}
 
+  spelling:
+    name: Spell Check with Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Spell Check Repo
+        uses: crate-ci/typos@b1a1ef3893ff35ade0cfa71523852a49bfd05d19 # v1.31.1
+
   golangci:
     name: Linter
     needs: detect-modules
@@ -130,7 +146,7 @@ jobs:
           # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
           # install-mode: "goinstall"
 
-      - name: Upload linter SARIF file
+      - name: Upload SARIF file
         if: always()
         uses: github/codeql-action/upload-sarif@45775bd8235c68ba998cffa5171334d58593da47 # v3.28.15
         with:
