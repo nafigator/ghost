@@ -25,7 +25,7 @@ OPTIONS
   -g, --go-image           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   -c, --govulncheck-image  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   -h, --help                                                                     display this help message
-  -l, --linter-image       <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
+  -l, --linter-image       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
   -m, --module-name        <string>    (default: github.com/test/test)           Go module name
   -n, --name               <string>    (default: test)                           Project short name
   -t, --shutdown-timeout   <duration>  (default: 10s)                            Timeout for graceful shutdown
@@ -36,7 +36,7 @@ ENVIRONMENT
   GHOST_DESCRIPTION        <string>    (default: Go microservice)                Project short description
   GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
   GHOST_GOVULNCHECK_IMAGE  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
-  GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.0.2)  Linter docker image
+  GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
   GHOST_MODULE_NAME        <string>    (default: github.com/test/test)           Go module name
   GHOST_NAME               <string>    (default: test)                           Project short name
   GHOST_SHUTDOWN_TIMEOUT   <duration>  (default: 10s)                            Timeout for graceful shutdown
