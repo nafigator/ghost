@@ -5,11 +5,13 @@ Go High-level Open Service Templater
 
 GHOST creates in working dir fully functional microservice with basic functionality:
 
-- Ready to use Makefile
+- Ready to use Makefile with help target
 - Ready to use docker-compose with override template
-- Kubernetes livecycle compatible healthchecks
+- Ready to use security checks by trivy, semgrep and govulncheck
+- Kubernetes livecycle compatible health checks
 - Log level changing by HTTP-request
 - Easy configurable logs (plain text|JSON)
+- Graceful shutdown
 
 ## Usage
 
