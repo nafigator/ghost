@@ -8,6 +8,7 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 
+	"{{ lower .GoModule }}/internal/app/config"
 	"{{ lower .GoModule }}/internal/app/container"
 	"{{ lower .GoModule }}/internal/app/http"
 	"{{ lower .GoModule }}/internal/app/readiness"
@@ -19,13 +20,18 @@ var build = "develop" //nolint:gochecknoglobals //ldd-flag
 func Run(c *zap.Config, log *zap.SugaredLogger) error {
 	var err error
 	var di *container.Container
+	var conf *config.Conf
 
-	srvErrors := make(chan error, 1)
-	defer close(srvErrors)
+	// -----------------------------------------------------------------------------------------------------------------
+	// Config initialization
+	conf, err = config.Init(build, log)
+	if err != nil {
+		return err
+	}
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Dependency Injection container
-	di, err = container.New(build, c, log)
+	di, err = container.New(conf, c, log)
 	if err != nil {
 		return err
 	}
@@ -45,6 +51,9 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// HTTP Servers startup
+	srvErrors := make(chan error, 1)
+	defer close(srvErrors)
+
 	http.Init(di, srvErrors)
 
 	// -----------------------------------------------------------------------------------------------------------------

@@ -7,18 +7,18 @@ const (
 	resourcesCount = 2
 )
 
+// Check waits data from ready channel and checks if all resources ready when received.
 func Check(ready chan struct{}, readyAll *bool) {
 	var count int
-
-	// Make sure that resources writing to ready channel exactly = resourcesCount.
-	// If some resources try to write into closed channel this will cause panic.
-	defer close(ready)
 
 	for range ready {
 		count++
 
 		if count == resourcesCount {
 			*readyAll = true
+
+			// If some resources try to write into closed channel this will cause panic.
+			close(ready)
 
 			return
 		}

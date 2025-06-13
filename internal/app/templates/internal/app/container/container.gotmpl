@@ -32,19 +32,13 @@ type Container struct {
 }
 
 // New creates new dependency injection container.
-func New(build string, logConf *zap.Config, log *zap.SugaredLogger) (*Container, error) {
-	conf, err := config.Init(build, log)
-	if err != nil {
-		return nil, err
-	}
-
+func New(conf *config.Conf, logConf *zap.Config, log *zap.SugaredLogger) (*Container, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	return &Container{
 		Conf:      conf,
 		Ctx:       ctx,
 		Cancel:    cancel,
-		Build:     build,
 		Log:       log,
 		LogConf:   logConf,
 		Interrupt: make(chan os.Signal, 1),
