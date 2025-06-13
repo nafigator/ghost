@@ -58,7 +58,7 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Signal handling initialization
-	signal.Notify(di.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(di.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(di.Interrupt)
 
 	// -----------------------------------------------------------------------------------------------------------------
