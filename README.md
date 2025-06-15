@@ -55,7 +55,7 @@ ENVIRONMENT
 docker run \
     -u $(id -u):$(id -g) --rm -ti \
     -v "$(pwd):/var/ghost" \
-    nafigat0r/ghost
+    nafigat0r/ghost --help
 ```
 </details>
 
