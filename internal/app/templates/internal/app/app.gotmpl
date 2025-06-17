@@ -22,25 +22,21 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 	var di *container.Container
 	var conf *config.Conf
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// Config initialization
 	conf, err = config.Init(build, log)
 	if err != nil {
 		return err
 	}
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// Dependency Injection container
 	di, err = container.New(conf, c, log)
 	if err != nil {
 		return err
 	}
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// Readiness processing
 	go readiness.Check(di.Ready, &di.ReadyAll)
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// GOMAXPROCS definitions
 	if _, err = maxprocs.Set(maxprocs.Logger(log.Debugf)); err != nil {
 		return err
@@ -49,19 +45,16 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 	log.Info("{{ .Name }} start")
 	defer log.Info("{{ .Name }} shutdown")
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// HTTP Servers startup
 	srvErrors := make(chan error, 1)
 	defer close(srvErrors)
 
 	http.Init(di, srvErrors)
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// Signal handling initialization
 	signal.Notify(di.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	defer signal.Stop(di.Interrupt)
 
-	// -----------------------------------------------------------------------------------------------------------------
 	// Shutdown
 	select {
 	case err = <-srvErrors:
