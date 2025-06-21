@@ -99,6 +99,18 @@ jobs:
       - name: Spell Check Repo
         uses: crate-ci/typos@b1a1ef3893ff35ade0cfa71523852a49bfd05d19 # v1.31.1
 
+  commit-me:
+    name: Conventional Commits Compliance
+    runs-on: ubuntu-latest
+    env:
+      # Enable colored output in GitHub Actions
+      FORCE_COLOR: 3
+    steps:
+      - uses: dev-build-deploy/commit-me@3e4b05860d83d9120140d8dd220b0d389ddc79a9 # v1.5.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Required to retrieve the commits associated with your Pull Request
+          include-commits: true  # OPTIONAL; forces the inclusion of commits associated with your Pull Request
+
   golangci:
     name: Linter
     needs: detect-modules
