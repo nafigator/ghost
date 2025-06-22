@@ -6,7 +6,7 @@ export GID:=$(shell id -g)
 export PROJECT:={{ lower .Name }}
 export EXTERNAL_AUX_PORT:=8080
 export AUX_PORT:=8080
-export ZAP_CONFIG_PATH:=./config.yml
+export ZAP_CONFIG_PATH:=./zapper.yml
 
 ifndef PROJECT_VERSION
 	PROJECT_VERSION:=$(shell git tag -l | tail -n 1)

@@ -42,7 +42,7 @@ var (
 	//go:embed templates/compose-api.override.gotmpl
 	composeOverrideAPISrc string
 
-	//go:embed templates/zap.gotmpl
+	//go:embed templates/zapper.gotmpl
 	zapSrc string
 
 	//go:embed templates/internal/app/app.gotmpl
@@ -190,7 +190,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  composeOverrideSrc,
 		},
 		"zap": {
-			file: "config.yml.dist",
+			file: "zapper.yml.dist",
 			src:  zapSrc,
 		},
 		"main": {
