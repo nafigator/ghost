@@ -6,6 +6,7 @@ export GID:=$(shell id -g)
 export PROJECT:={{ lower .Name }}
 export EXTERNAL_AUX_PORT:=8080
 export AUX_PORT:=8080
+{{- if .WithREST }}{{ template "MakefileAPIPorts" . }}{{ end }}
 export ZAP_CONFIG_PATH:=./bin/zapper.yml
 
 ifndef PROJECT_VERSION
