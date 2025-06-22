@@ -21,6 +21,9 @@ var (
 	//go:embed templates/gomod.gotmpl
 	gomodSrc string
 
+	//go:embed templates/gosum.gotmpl
+	gosumSrc string
+
 	//go:embed templates/golangci.gotmpl
 	golangciSrc string
 
@@ -36,14 +39,14 @@ var (
 	//go:embed templates/compose.gotmpl
 	composeSrc string
 
-	//go:embed templates/compose.override.gotmpl
+	//go:embed templates/build/compose.override.gotmpl
 	composeOverrideSrc string
 
-	//go:embed templates/compose-api.override.gotmpl
+	//go:embed templates/build/compose-api.override.gotmpl
 	composeOverrideAPISrc string
 
-	//go:embed templates/zapper.gotmpl
-	zapSrc string
+	//go:embed templates/build/zapper.gotmpl
+	zapperSrc string
 
 	//go:embed templates/internal/app/app.gotmpl
 	appSrc string
@@ -125,7 +128,13 @@ func templates(c *config.Conf) tps {
 		}
 
 		t["compose-override"] = tp{
-			file: "docker-compose.override.yml.dist",
+			file: "docker-compose.override.yml",
+			src:  composeOverrideAPISrc,
+		}
+
+		t["compose-override-dist"] = tp{
+			dir:  "build",
+			file: "build/docker-compose.override.dist.yml",
 			src:  composeOverrideAPISrc,
 		}
 
@@ -177,6 +186,10 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			file: "go.mod",
 			src:  gomodSrc,
 		},
+		"gosum": {
+			file: "go.sum",
+			src:  gosumSrc,
+		},
 		"makefile": {
 			file: "Makefile",
 			src:  makefileSrc,
@@ -186,12 +199,23 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  composeSrc,
 		},
 		"compose-override": {
-			file: "docker-compose.override.yml.dist",
+			file: "docker-compose.override.yml",
 			src:  composeOverrideSrc,
 		},
-		"zap": {
-			file: "zapper.yml.dist",
-			src:  zapSrc,
+		"compose-override-dist": {
+			dir:  "build",
+			file: "build/docker-compose.override.dist.yml",
+			src:  composeOverrideSrc,
+		},
+		"zapper": {
+			dir:  "bin",
+			file: "bin/zapper.yml",
+			src:  zapperSrc,
+		},
+		"zapper-dist": {
+			dir:  "build",
+			file: "build/zapper.dist.yml",
+			src:  zapperSrc,
 		},
 		"main": {
 			dir:  "cmd",

@@ -6,7 +6,7 @@ export GID:=$(shell id -g)
 export PROJECT:={{ lower .Name }}
 export EXTERNAL_AUX_PORT:=8080
 export AUX_PORT:=8080
-export ZAP_CONFIG_PATH:=./zapper.yml
+export ZAP_CONFIG_PATH:=./bin/zapper.yml
 
 ifndef PROJECT_VERSION
 	PROJECT_VERSION:=$(shell git tag -l | tail -n 1)
@@ -51,8 +51,6 @@ $(shell test -r $(HOME)/.ssh/known_hosts || touch $(HOME)/.ssh/known_hosts)
 $(shell test -r $(HOME)/.giconfig || touch $(HOME)/.gitconfig)
 $(shell test -d $(GOPATH)/pkg || mkdir -p $(GOPATH)/pkg)
 $(shell test -d $(GOPATH)/mod || mkdir -p $(GOPATH)/mod)
-$(shell test -r $(ZAP_CONFIG_PATH) || cp $(ZAP_CONFIG_PATH).dist $(ZAP_CONFIG_PATH))
-$(shell test -r docker-compose.override.yml || cp docker-compose.override.yml.dist docker-compose.override.yml)
 
 # https://docs.docker.com/desktop/mac/networking/#ssh-agent-forwarding
 ifeq ($(PLATFORM),Darwin)
@@ -82,7 +80,7 @@ export GOVULNCHECK_IMAGE:={{ lower .GovulncheckImage }}
 export SEMGREP_IMAGE:=semgrep/semgrep:1.125.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
-	-X "{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
+	-X \"{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)\"'
 
 export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-e HOME=$(DOCKER_MOUNT_POINT) \
@@ -123,10 +121,10 @@ DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
 build: deps #? Build binary
 	$(info Build binary...)
 	$(info Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64))
-	@$(DOCKER_RUN_INTERACTIVE) build \
-		-ldflags=$(LD_FLAGS) \
+	@$(DOCKER_BASH_INTERACTIVE) -c "umask 0027; \
+		go build -ldflags=$(LD_FLAGS) \
 		-o $(DOCKER_MOUNT_POINT)/bin/{{ lower .Name }} \
-		$(DOCKER_MOUNT_POINT)/cmd/main.go
+		$(DOCKER_MOUNT_POINT)/cmd/main.go"
 
 .PHONY: rebuild
 rebuild: build #? Rebuild {{ lower .Name }}
@@ -156,7 +154,7 @@ down: #? Down environment
 .PHONY: deps
 deps: tidy #? Run go mod tidy & vendor
 	$(info Run go mod vendor...)
-	@$(DOCKER_RUN_INTERACTIVE) mod vendor
+	@$(DOCKER_BASH_INTERACTIVE) -c "umask 0027; go mod vendor"
 
 .PHONY: ps
 ps: #? Show containers status
@@ -165,7 +163,7 @@ ps: #? Show containers status
 .PHONY: tidy
 tidy: #? Run go mod tidy
 	$(info Run go mod tidy...)
-	@$(DOCKER_RUN_INTERACTIVE) mod tidy
+	@$(DOCKER_BASH_INTERACTIVE) -c "umask 0027; go mod tidy"
 
 .PHONY: log
 log: #? Container log
