@@ -4,8 +4,8 @@ go 1.24.3
 
 require (
 	github.com/ardanlabs/conf/v3 v3.8.0
-	github.com/nafigator/zapper v1.0.7
-	github.com/nafigator/zapper/conf v1.1.7
+	github.com/nafigator/zapper v1.0.8
+	github.com/nafigator/zapper/conf v1.1.8
 	go.uber.org/zap v1.27.0
 )
 
