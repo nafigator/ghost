@@ -26,6 +26,7 @@ func generate(c *config.Conf) error {
 		"GoImage":          c.GoImage,
 		"GovulncheckImage": c.GovulncheckImage,
 		"LinterImage":      c.LinterImage,
+		"WithREST":         c.WithREST,
 	}
 
 	fn := template.FuncMap{
@@ -40,6 +41,12 @@ func generate(c *config.Conf) error {
 
 		if tpl, err = template.New(name).Funcs(fn).Parse(t.src); err != nil {
 			return err
+		}
+
+		for _, inc := range t.inc {
+			if tpl, err = tpl.Parse(inc); err != nil {
+				return err
+			}
 		}
 
 		if f, err = os.OpenFile(t.file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(fileStrictMode)); err != nil {

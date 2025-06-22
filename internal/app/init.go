@@ -10,6 +10,7 @@ type tp struct {
 	dir  string
 	file string
 	src  string
+	inc  []string
 }
 
 type tps map[string]tp
@@ -33,17 +34,14 @@ var (
 	//go:embed templates/makefile.gotmpl
 	makefileSrc string
 
-	//go:embed templates/makefile-api.gotmpl
-	makefileAPISrc string
+	//go:embed templates/includes/rest.gotmpl
+	withREST string
 
 	//go:embed templates/compose.gotmpl
 	composeSrc string
 
 	//go:embed templates/build/compose.override.gotmpl
 	composeOverrideSrc string
-
-	//go:embed templates/build/compose-api.override.gotmpl
-	composeOverrideAPISrc string
 
 	//go:embed templates/build/zapper.gotmpl
 	zapperSrc string
@@ -57,23 +55,14 @@ var (
 	//go:embed templates/internal/app/config/config.gotmpl
 	configSrc string
 
-	//go:embed templates/internal/app/config/config-api.gotmpl
-	configAPISrc string
-
 	//go:embed templates/internal/app/container/container.gotmpl
 	containerSrc string
 
 	//go:embed templates/internal/app/http/init.gotmpl
 	httpInitSrc string
 
-	//go:embed templates/internal/app/http/init-api.gotmpl
-	httpInitAPISrc string
-
 	//go:embed templates/internal/app/http/mux.gotmpl
 	httpMuxSrc string
-
-	//go:embed templates/internal/app/http/mux-api.gotmpl
-	httpMuxAPISrc string
 
 	//go:embed templates/internal/app/http/handlers/support/build.gotmpl
 	buildSrc string
@@ -99,9 +88,6 @@ var (
 	//go:embed templates/internal/app/readiness/readiness.gotmpl
 	readinessSrc string
 
-	//go:embed templates/internal/app/readiness/readiness-api.gotmpl
-	readinessAPISrc string
-
 	//go:embed templates/internal/app/http/errors/errors.gotmpl
 	errorsSrc string
 
@@ -122,50 +108,10 @@ func templates(c *config.Conf) tps {
 	t := common()
 
 	if c.WithREST {
-		t["makefile"] = tp{
-			file: "Makefile",
-			src:  makefileAPISrc,
-		}
-
-		t["compose-override"] = tp{
-			file: "docker-compose.override.yml",
-			src:  composeOverrideAPISrc,
-		}
-
-		t["compose-override-dist"] = tp{
-			dir:  "build",
-			file: "build/docker-compose.override.dist.yml",
-			src:  composeOverrideAPISrc,
-		}
-
-		t["config"] = tp{
-			dir:  "internal/app/config",
-			file: "internal/app/config/config.go",
-			src:  configAPISrc,
-		}
-
-		t["init"] = tp{
-			dir:  "internal/app/http",
-			file: "internal/app/http/init.go",
-			src:  httpInitAPISrc,
-		}
-
-		t["mux"] = tp{
-			dir:  "internal/app/http",
-			file: "internal/app/http/mux.go",
-			src:  httpMuxAPISrc,
-		}
-
 		t["index"] = tp{
 			dir:  "internal/app/http/handlers/api",
 			file: "internal/app/http/handlers/api/index.go",
 			src:  indexAPISrc,
-		}
-
-		t["readiness"] = tp{
-			dir:  "internal/app/readiness",
-			file: "internal/app/readiness/readiness.go",
-			src:  readinessAPISrc,
 		}
 	}
 
@@ -193,6 +139,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 		"makefile": {
 			file: "Makefile",
 			src:  makefileSrc,
+			inc:  []string{withREST},
 		},
 		"compose": {
 			file: "docker-compose.yml",
@@ -201,11 +148,13 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 		"compose-override": {
 			file: "docker-compose.override.yml",
 			src:  composeOverrideSrc,
+			inc:  []string{withREST},
 		},
 		"compose-override-dist": {
 			dir:  "build",
 			file: "build/docker-compose.override.dist.yml",
 			src:  composeOverrideSrc,
+			inc:  []string{withREST},
 		},
 		"zapper": {
 			dir:  "bin",
@@ -236,6 +185,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			dir:  "internal/app/config",
 			file: "internal/app/config/config.go",
 			src:  configSrc,
+			inc:  []string{withREST},
 		},
 		"container": {
 			dir:  "internal/app/container",
@@ -246,11 +196,13 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			dir:  "internal/app/http",
 			file: "internal/app/http/init.go",
 			src:  httpInitSrc,
+			inc:  []string{withREST},
 		},
 		"mux": {
 			dir:  "internal/app/http",
 			file: "internal/app/http/mux.go",
 			src:  httpMuxSrc,
+			inc:  []string{withREST},
 		},
 		"build": {
 			dir:  "internal/app/http/handlers/support",

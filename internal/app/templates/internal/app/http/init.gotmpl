@@ -15,6 +15,7 @@ import (
 
 const (
 	aux         = "Aux server"
+	{{- if .WithREST }}{{ template "InitConstRest" . }}{{ end }}
 	tcp         = "tcp"
 	timeout     = 100 * time.Millisecond
 	listening   = "App listening on %s"
@@ -25,8 +26,10 @@ const (
 // Init initializes HTTP servers.
 func Init(di *container.Container, srvErrors chan<- error) {
 	go waitForSocket(di, di.Conf.AuxSocket)
+	{{- if .WithREST }}{{ template "InitWaitForSrvSocket" . }}{{ end }}
 
 	startAuxServer(di, srvErrors)
+	{{- if .WithREST }}{{ template "InitStartServerCall" . }}{{ end }}
 }
 
 func startAuxServer(di *container.Container, srvErrors chan<- error) {
@@ -47,7 +50,7 @@ func startAuxServer(di *container.Container, srvErrors chan<- error) {
 
 	di.Closers[aux] = &srv
 }
-
+{{ if .WithREST }}{{ template "InitStartServer" . }}{{ end }}
 // waitForSocket checks socket availability.
 func waitForSocket(di *container.Container, socket string) {
 	for {

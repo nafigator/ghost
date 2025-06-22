@@ -2,9 +2,9 @@
 package readiness
 
 const (
-	// There is one resource needed to check readiness - Aux HTTP-server.
+	{{ if .WithREST }}// There is two resources needed to check readiness: Aux and REST HTTP-servers.{{ else }}// There is one resource needed to check readiness - Aux HTTP-server.{{ end }}
 	// Increase this value if you are expecting ready status from other resources.
-	resourcesCount = 1
+	resourcesCount = {{ if .WithREST -}} 2 {{- else -}} 1 {{- end }}
 )
 
 // Check waits data from ready channel and checks if all resources ready when received.
