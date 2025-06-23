@@ -24,7 +24,7 @@ Usage: ghost [options...]
 
 OPTIONS
   -d, --description        <string>    (default: Go microservice)                Project short description
-  -g, --go-image           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
+  -g, --go-image           <string>    (default: nafigat0r/go:1.24.4)            Go docker image
   -c, --govulncheck-image  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   -h, --help                                                                     display this help message
   -l, --linter-image       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
@@ -36,7 +36,7 @@ OPTIONS
 
 ENVIRONMENT
   GHOST_DESCRIPTION        <string>    (default: Go microservice)                Project short description
-  GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.24.3)            Go docker image
+  GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.24.4)            Go docker image
   GHOST_GOVULNCHECK_IMAGE  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
   GHOST_MODULE_NAME        <string>    (default: github.com/test/test)           Go module name
