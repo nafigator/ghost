@@ -36,6 +36,6 @@ func (h *Handler) Readiness(*http.Request, any) mux.Response {
 }
 
 // Liveness implements liveness probe logic.
-func (h *Handler) Liveness(*http.Request, any) mux.Response {
+func (h *Handler) Liveness(_ *http.Request, _ any) mux.Response {
 	return new(response.Ok)
 }

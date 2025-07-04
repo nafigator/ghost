@@ -91,6 +91,9 @@ var (
 	//go:embed templates/internal/app/http/errors/errors.gotmpl
 	errorsSrc string
 
+	//go:embed templates/internal/sdk/readiness/socket/socket.gotmpl
+	readinessSocketSrc string
+
 	//go:embed templates/internal/sdk/http/mux/middleware.gotmpl
 	middlewareSrc string
 
@@ -243,6 +246,11 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			dir:  "internal/app/readiness",
 			file: "internal/app/readiness/readiness.go",
 			src:  readinessSrc,
+		},
+		"socket": {
+			dir:  "internal/sdk/readiness/socket",
+			file: "internal/sdk/readiness/socket/socket.go",
+			src:  readinessSocketSrc,
 		},
 		"middleware": {
 			dir:  "internal/sdk/http/mux",

@@ -24,6 +24,10 @@ ifndef IMAGE_TAG
 	export IMAGE_TAG:=$(shell git tag --sort=version:refname | tail -n1 | sed -e 's/v//')
 endif
 
+ifndef CURRENT_BRANCH
+	export CURRENT_BRANCH=$(shell git branch --show-current)
+endif
+
 ifndef GOPATH
 	export GOPATH:=$(HOME)/.local/go
 endif
@@ -82,7 +86,7 @@ export GOVULNCHECK_IMAGE:=nafigat0r/govulncheck:1.1.4
 export SEMGREP_IMAGE:=semgrep/semgrep:1.125.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
-	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
+	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(CURRENT_BRANCH)/$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
 
 export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-e HOME=$(DOCKER_MOUNT_POINT) \

@@ -24,8 +24,8 @@ type Conf struct {
 	ShutdownTimeout time.Duration `conf:"default:10s,short:t,help:Timeout for graceful shutdown"`
 }
 
-// Init initializes application config.
-func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
+// New initializes application config.
+func New(build string, log *zap.SugaredLogger) (*Conf, error) {
 	var c string
 	var err error
 

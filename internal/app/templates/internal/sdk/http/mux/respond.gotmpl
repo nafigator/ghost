@@ -48,9 +48,6 @@ func write(ctx context.Context, w http.ResponseWriter, resp Response) error {
 		return nil
 	case http.StatusServiceUnavailable:
 		w.Header().Set(headers.RetryAfter, waitTimeout)
-		w.WriteHeader(status)
-
-		return nil
 	}
 
 	data, ct := resp.Data()
@@ -79,6 +76,10 @@ func write(ctx context.Context, w http.ResponseWriter, resp Response) error {
 			return fmt.Errorf(writeMsg, err)
 		}
 	default:
+		if status == http.StatusServiceUnavailable {
+			return nil
+		}
+
 		return fmt.Errorf(unsupported, ct)
 	}
 

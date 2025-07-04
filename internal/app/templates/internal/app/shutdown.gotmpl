@@ -10,14 +10,12 @@ import (
 )
 
 const (
-	graceSuccess = "%s shutdown complete"
-	graceFail    = "%s graceful shutdown did not complete in %v: %s"
+	graceComplete = "%s graceful shutdown complete"
+	graceFail     = "%s graceful shutdown did not complete in %v: %s"
 )
 
 func shutdown(di *container.Container, log *zap.SugaredLogger) {
 	var wg sync.WaitGroup
-
-	defer di.Cancel()
 
 	count := len(di.Closers)
 	if count == 0 {
@@ -30,7 +28,7 @@ func shutdown(di *container.Container, log *zap.SugaredLogger) {
 		go func(wg *sync.WaitGroup) {
 			var err error
 
-			defer log.Debugf(graceSuccess, name)
+			defer log.Debugf(graceComplete, name)
 			defer wg.Done()
 
 			ctx, cancel := context.WithTimeout(context.Background(), di.Conf.ShutdownTimeout)

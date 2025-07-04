@@ -9,19 +9,23 @@ export API_PORT:=80
 	SrvSocket       string        `conf:"default:0.0.0.0:80,short:s,help:HTTP server host and port"`
 {{- end }}
 {{ define "InitConstRest" }}
-	rest        = "REST server"
+	aux  = "Aux server"
+	rest = "REST server"
+{{- end }}
+{{ define "InitConstOrig" }}
+	aux = "Aux server"
 {{- end }}
 {{ define "InitWaitForSrvSocket" }}
-	go waitForSocket(di, di.Conf.SrvSocket)
+	go socket.Wait(ready, di.Conf.SrvSocket, di.Log)
 {{- end }}
 {{ define "InitStartServerCall" }}
-	startServer(di, srvErrors)
+	startServer(ctx, di, srvErrors)
 {{- end }}
 {{ define "InitStartServer" }}
-func startServer(di *container.Container, srvErrors chan<- error) {
+func startServer(ctx context.Context, di *container.Container, srvErrors chan<- error) {
 	srv := http.Server{
 		BaseContext: func(_ net.Listener) context.Context {
-			return di.Ctx
+			return ctx
 		},
 		Addr:         di.Conf.SrvSocket,
 		Handler:      srvMux(di),
@@ -31,7 +35,9 @@ func startServer(di *container.Container, srvErrors chan<- error) {
 	}
 
 	go func() {
-		srvErrors <- srv.ListenAndServe()
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			srvErrors <- err
+		}
 	}()
 
 	di.Closers[rest] = &srv

@@ -5,3 +5,9 @@ services:
     ports:
       - "0.0.0.0:${EXTERNAL_AUX_PORT}:${AUX_PORT}"
       {{- if .WithREST }}{{ template "ComposeOverrideExternalAPI" . }}{{ end }}
+    networks:
+      - {{ lower .Name }}
+
+networks:
+  {{ lower .Name }}:
+    external: true

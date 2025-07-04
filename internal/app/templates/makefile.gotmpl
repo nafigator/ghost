@@ -29,6 +29,10 @@ ifndef PROJECT_REVISION
 	export PROJECT_REVISION:=$(shell git log -n 1 --format=%h)
 endif
 
+ifndef CURRENT_BRANCH
+	export CURRENT_BRANCH=$(shell git branch --show-current)
+endif
+
 ifndef GOPATH
 	export GOPATH:=$(HOME)/.local/go)
 endif
@@ -81,7 +85,7 @@ export GOVULNCHECK_IMAGE:={{ lower .GovulncheckImage }}
 export SEMGREP_IMAGE:=semgrep/semgrep:1.125.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
-	-X \"{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(PROJECT_REVISION), build time: $(BUILD_TIME)\"'
+	-X \"{{ lower .GoModule }}/internal/app.build=$(PROJECT_VERSION), rev.$(CURRENT_BRANCH)/$(PROJECT_REVISION), build time: $(BUILD_TIME)\"'
 
 export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-e HOME=$(DOCKER_MOUNT_POINT) \
@@ -128,13 +132,13 @@ build: deps #? Build binary
 		$(DOCKER_MOUNT_POINT)/cmd/main.go"
 
 .PHONY: rebuild
-rebuild: build #? Rebuild {{ lower .Name }}
+rebuild: build network #? Rebuild {{ lower .Name }}
 	$(info Rebuild and run {{ lower .Name }}...)
 	@docker-compose up -d --remove-orphans --no-deps --force-recreate --build {{ lower .Name }}
 	@docker-compose ps
 
 .PHONY: up
-up: build #? Up environment
+up: build network #? Up environment
 	$(info Up environment...)
 	@docker-compose up -d --remove-orphans
 	@docker-compose ps
@@ -151,6 +155,13 @@ down: #? Down environment
 	fi
 	@echo "Run docker command: $(cmd)"
 	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
+
+.PHONY: network
+network: #? Check docker network
+	$(info Check docker network...)
+	@if [ -z "$(shell docker network ls | grep {{ lower .Name }})" ]; then \
+		docker network create {{ lower .Name }}; \
+	fi
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy & vendor

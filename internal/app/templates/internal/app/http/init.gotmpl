@@ -3,39 +3,38 @@ package http
 
 import (
 	"context"
+	"errors"
 	"log" //nolint:depguard // Log errors through wrapper with zap log
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/nafigator/zapper/writer"
 
 	"{{ lower .GoModule }}/internal/app/container"
+	"{{ lower .GoModule }}/internal/sdk/readiness/socket"
 )
 
 const (
-	aux         = "Aux server"
-	{{- if .WithREST }}{{ template "InitConstRest" . }}{{ end }}
-	tcp         = "tcp"
-	timeout     = 100 * time.Millisecond
-	listening   = "App listening on %s"
-	notReady    = "HTTP-socket %s not ready"
-	closeUnable = "Unable to close TCP connection checking HTTP port: %s"
+	{{- if .WithREST }}
+		{{- template "InitConstRest" . }}
+	{{- else -}}
+		{{- template "InitConstOrig" . }}
+	{{- end }}
 )
 
 // Init initializes HTTP servers.
-func Init(di *container.Container, srvErrors chan<- error) {
-	go waitForSocket(di, di.Conf.AuxSocket)
+func Init(ctx context.Context, ready chan struct{}, di *container.Container, srvErrors chan<- error) {
+	go socket.Wait(ready, di.Conf.AuxSocket, di.Log)
 	{{- if .WithREST }}{{ template "InitWaitForSrvSocket" . }}{{ end }}
 
-	startAuxServer(di, srvErrors)
+	startAuxServer(ctx, di, srvErrors)
 	{{- if .WithREST }}{{ template "InitStartServerCall" . }}{{ end }}
 }
 
-func startAuxServer(di *container.Container, srvErrors chan<- error) {
+func startAuxServer(ctx context.Context, di *container.Container, srvErrors chan<- error) {
 	srv := http.Server{
 		BaseContext: func(_ net.Listener) context.Context {
-			return di.Ctx
+			return ctx
 		},
 		Addr:         di.Conf.AuxSocket,
 		Handler:      auxMux(di),
@@ -45,28 +44,11 @@ func startAuxServer(di *container.Container, srvErrors chan<- error) {
 	}
 
 	go func() {
-		srvErrors <- srv.ListenAndServe()
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			srvErrors <- err
+		}
 	}()
 
 	di.Closers[aux] = &srv
 }
-{{ if .WithREST }}{{ template "InitStartServer" . }}{{ end }}
-// waitForSocket checks socket availability.
-func waitForSocket(di *container.Container, socket string) {
-	for {
-		if conn, err := net.DialTimeout(tcp, socket, timeout); err == nil {
-			di.Ready <- struct{}{}
-			di.Log.Infof(listening, socket)
-
-			if e := conn.Close(); e != nil {
-				di.Log.Warnf(closeUnable, e)
-			}
-
-			return
-		}
-
-		di.Log.Debugf(notReady, socket)
-
-		time.Sleep(timeout)
-	}
-}
+{{ if .WithREST }}{{ template "InitStartServer" . }}{{ end -}}

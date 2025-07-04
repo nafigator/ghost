@@ -2,6 +2,8 @@
 package app
 
 import (
+	"context"
+	"os"
 	"os/signal"
 	"syscall"
 
@@ -18,24 +20,29 @@ var build = "develop" //nolint:gochecknoglobals //ldd-flag
 
 // Run runs application.
 func Run(c *zap.Config, log *zap.SugaredLogger) error {
-	var err error
-	var di *container.Container
 	var conf *config.Conf
+	var di *container.Container
+	var err error
+
+	// Global context
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Readiness channel
+	ready := make(chan struct{}, readiness.Resources)
 
 	// Config initialization
-	conf, err = config.Init(build, log)
-	if err != nil {
+	if conf, err = config.New(build, log); err != nil {
 		return err
 	}
 
 	// Dependency Injection container
-	di, err = container.New(conf, c, log)
-	if err != nil {
+	if di, err = container.New(conf, c, log); err != nil {
 		return err
 	}
 
 	// Readiness processing
-	go readiness.Check(di.Ready, &di.ReadyAll)
+	go readiness.Check(ready, &di.ReadyAll)
 
 	// GOMAXPROCS definitions
 	if _, err = maxprocs.Set(maxprocs.Logger(log.Debugf)); err != nil {
@@ -49,11 +56,12 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 	srvErrors := make(chan error, 1)
 	defer close(srvErrors)
 
-	http.Init(di, srvErrors)
+	http.Init(ctx, ready, di, srvErrors)
 
 	// Signal handling initialization
-	signal.Notify(di.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	defer signal.Stop(di.Interrupt)
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	defer signal.Stop(interrupt)
 
 	// Shutdown
 	select {
@@ -61,7 +69,7 @@ func Run(c *zap.Config, log *zap.SugaredLogger) error {
 		shutdown(di, log)
 
 		return err
-	case s := <-di.Interrupt:
+	case s := <-interrupt:
 		log.Infof("Received signal: %s", s)
 
 		shutdown(di, log)

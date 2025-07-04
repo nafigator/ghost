@@ -32,4 +32,4 @@ func auxMux(di *container.Container) http.Handler {
 
 	return m
 }
-{{ if .WithREST }}{{ template "MuxSrvMux" . }}{{ end -}}
+{{ if .WithREST }}{{- template "MuxSrvMux" . }}{{ end -}}

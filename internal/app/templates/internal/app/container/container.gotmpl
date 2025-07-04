@@ -3,7 +3,6 @@ package container
 
 import (
 	"context"
-	"os"
 
 	"go.uber.org/zap"
 
@@ -19,30 +18,21 @@ type closer interface {
 
 // Container dependency injection container.
 type Container struct {
-	Ctx       context.Context
-	Cancel    context.CancelFunc
-	Conf      *config.Conf
-	Interrupt chan os.Signal
-	Log       *zap.SugaredLogger
-	LogConf   *zap.Config
-	Closers   map[string]closer
-	Ready     chan struct{}
-	Build     string
-	ReadyAll  bool
+	Conf     *config.Conf
+	Log      *zap.SugaredLogger
+	LogConf  *zap.Config
+	Closers  map[string]closer
+	ReadyAll bool
 }
 
 // New creates new dependency injection container.
 func New(conf *config.Conf, logConf *zap.Config, log *zap.SugaredLogger) (*Container, error) {
-	ctx, cancel := context.WithCancel(context.Background())
+	c := Container{
+		Conf:    conf,
+		Log:     log,
+		LogConf: logConf,
+		Closers: make(map[string]closer),
+	}
 
-	return &Container{
-		Conf:      conf,
-		Ctx:       ctx,
-		Cancel:    cancel,
-		Log:       log,
-		LogConf:   logConf,
-		Interrupt: make(chan os.Signal, 1),
-		Closers:   make(map[string]closer),
-		Ready:     make(chan struct{}),
-	}, nil
+	return &c, nil
 }

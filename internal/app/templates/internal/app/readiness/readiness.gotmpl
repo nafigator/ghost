@@ -2,9 +2,9 @@
 package readiness
 
 const (
-	{{ if .WithREST }}// There is two resources needed to check readiness: Aux and REST HTTP-servers.{{ else }}// There is one resource needed to check readiness - Aux HTTP-server.{{ end }}
+	// Resources is count of resources needed to check readiness.
 	// Increase this value if you are expecting ready status from other resources.
-	resourcesCount = {{ if .WithREST -}} 2 {{- else -}} 1 {{- end }}
+	Resources = {{ if .WithREST -}} 2 {{- else -}} 1 {{- end }}
 )
 
 // Check waits data from ready channel and checks if all resources ready when received.
@@ -14,7 +14,7 @@ func Check(ready chan struct{}, readyAll *bool) {
 	for range ready {
 		count++
 
-		if count == resourcesCount {
+		if count == Resources {
 			*readyAll = true
 
 			// If some resources try to write into closed channel this will cause panic.

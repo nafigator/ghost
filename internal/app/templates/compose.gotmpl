@@ -5,7 +5,7 @@ services:
     image: {{ lower .GoImage }}
     container_name: {{ lower .Name }}
     hostname: {{ lower .Name }}
-    user: ${GID}:${UID}
+    user: ${UID}:${GID}
     read_only: true
     environment:
       - TZ=${TZ}

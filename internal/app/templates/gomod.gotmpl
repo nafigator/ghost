@@ -1,4 +1,4 @@
-module {{ lower .GoModule }}
+module github.com/test/gateway
 
 go 1.24.4
 
@@ -7,11 +7,11 @@ require (
 	github.com/dimfeld/httptreemux/v5 v5.5.0
 	github.com/nafigator/http/headers v1.0.10
 	github.com/nafigator/http/mime v1.1.0
-	github.com/nafigator/http/response/status v1.0.0
+	github.com/nafigator/http/response/status v1.1.0
 	github.com/nafigator/http/server/dumper v1.0.5
 	github.com/nafigator/http/storage/debug v1.0.2
 	github.com/nafigator/pointer v0.1.0
-	github.com/nafigator/zapper v1.0.8
+	github.com/nafigator/zapper v1.0.9
 	github.com/nafigator/zapper/conf v1.1.8
 	github.com/nafigator/zapper/writer v1.0.3
 	go.uber.org/automaxprocs v1.6.0
@@ -19,8 +19,8 @@ require (
 )
 
 require (
-	github.com/kontera-technologies/zap-net-sink v1.0.2 // indirect
 	github.com/nafigator/http/response/wrapper v1.0.2 // indirect
+	github.com/nafigator/zap-net-sink v1.0.3 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

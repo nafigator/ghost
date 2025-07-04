@@ -1,0 +1,37 @@
+// Package socket provides socket availability checking functionality.
+package socket
+
+import (
+	"net"
+	"time"
+
+	"go.uber.org/zap"
+)
+
+const (
+	tcp         = "tcp"
+	timeout     = 100 * time.Millisecond
+	socketReady = "Socket %s is ready to connect"
+	notReady    = "HTTP-socket %s not ready"
+	closeUnable = "Unable to close socket availability TCP connection: %s"
+)
+
+// Wait checks socket availability.
+func Wait(ready chan struct{}, socket string, log *zap.SugaredLogger) {
+	for {
+		if conn, err := net.DialTimeout(tcp, socket, timeout); err == nil {
+			ready <- struct{}{}
+			log.Infof(socketReady, socket)
+
+			if e := conn.Close(); e != nil {
+				log.Warnf(closeUnable, e)
+			}
+
+			return
+		}
+
+		log.Debugf(notReady, socket)
+
+		time.Sleep(timeout)
+	}
+}
