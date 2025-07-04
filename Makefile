@@ -108,11 +108,11 @@ export GO_DOCKER_PARAMS:="-u $(UID):$(GID) \
 	-w $(DOCKER_MOUNT_POINT) \
 	--network host"
 
-DOCKER_RUN_INTERACTIVE:=docker run -ti --rm \
+GO_RUN_INTERACTIVE:=docker run -ti --rm \
 	"$(GO_DOCKER_PARAMS)" \
 	$(GO_IMAGE)
 
-DOCKER_BASH_INTERACTIVE:=docker run -ti --rm \
+BASH_RUN_INTERACTIVE:=docker run -ti --rm \
 	"$(GO_DOCKER_PARAMS)" \
 	--entrypoint='/bin/bash' \
 	$(GO_IMAGE)
@@ -124,17 +124,17 @@ dc: #? Run custom docker command
 		exit 2; \
 	fi
 	@echo "Run docker command: $(cmd)"
-	@$(DOCKER_BASH_INTERACTIVE) -c "$(cmd)"
+	@$(BASH_RUN_INTERACTIVE) -c "$(cmd)"
 
 .PHONY: deps
 deps: tidy #? Run go mod tidy and vendor
 	$(info Run go mod vendor...)
-	@$(DOCKER_RUN_INTERACTIVE) mod vendor
+	@$(GO_RUN_INTERACTIVE) mod vendor
 
 .PHONY: tidy
 tidy: #? Run go mod tidy
 	$(info Run go mod tidy...)
-	@$(DOCKER_RUN_INTERACTIVE) mod tidy
+	@$(GO_RUN_INTERACTIVE) mod tidy
 
 .PHONY: log
 log: #? Container log
@@ -158,7 +158,7 @@ fix-alignment: #? Fix linter alignment issues
 build: deps #? Build binary
 	$(info Build binary...)
 	$(info Environment: GOOS:$(GOOS), GOARCH:$(GOARCH), GOAMD64:$(GOAMD64))
-	@$(DOCKER_RUN_INTERACTIVE) build \
+	@$(GO_RUN_INTERACTIVE) build \
 		-ldflags=$(LD_FLAGS) \
 		-o $(DOCKER_MOUNT_POINT)/bin/ghost \
 		$(DOCKER_MOUNT_POINT)/cmd/main.go
