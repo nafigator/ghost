@@ -24,7 +24,7 @@ const (
 
 // Init initializes HTTP servers.
 func Init(ctx context.Context, ready chan struct{}, di *container.Container, srvErrors chan<- error) {
-	go socket.Wait(ready, di.Conf.AuxSocket, di.Log)
+	go socket.Wait(ctx, ready, di.Conf.AuxSocket, di.Log)
 	{{- if .WithREST }}{{ template "InitWaitForSrvSocket" . }}{{ end }}
 
 	startAuxServer(ctx, di, srvErrors)

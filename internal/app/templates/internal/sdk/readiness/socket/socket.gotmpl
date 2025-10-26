@@ -2,6 +2,7 @@
 package socket
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -17,9 +18,11 @@ const (
 )
 
 // Wait checks socket availability.
-func Wait(ready chan struct{}, socket string, log *zap.SugaredLogger) {
+func Wait(ctx context.Context, ready chan struct{}, socket string, log *zap.SugaredLogger) {
 	for {
-		if conn, err := net.DialTimeout(tcp, socket, timeout); err == nil {
+		d := net.Dialer{Timeout: timeout}
+
+		if conn, err := d.DialContext(ctx, tcp, socket); err == nil {
 			ready <- struct{}{}
 			log.Infof(socketReady, socket)
 

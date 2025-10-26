@@ -16,7 +16,7 @@ export API_PORT:=80
 	aux = "Aux server"
 {{- end }}
 {{ define "InitWaitForSrvSocket" }}
-	go socket.Wait(ready, di.Conf.SrvSocket, di.Log)
+	go socket.Wait(ctx, ready, di.Conf.SrvSocket, di.Log)
 {{- end }}
 {{ define "InitStartServerCall" }}
 	startServer(ctx, di, srvErrors)

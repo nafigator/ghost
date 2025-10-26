@@ -3,9 +3,9 @@ module github.com/nafigator/ghost
 go 1.24.4
 
 require (
-	github.com/ardanlabs/conf/v3 v3.8.0
-	github.com/nafigator/zapper v1.0.9
-	github.com/nafigator/zapper/conf v1.1.8
+	github.com/ardanlabs/conf/v3 v3.9.0
+	github.com/nafigator/zapper v1.0.11
+	github.com/nafigator/zapper/conf v1.1.9
 	go.uber.org/zap v1.27.0
 )
 

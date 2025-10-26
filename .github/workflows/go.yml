@@ -16,8 +16,8 @@ on:
     - cron: '29 6 * * *'
 
 env:
-  GOLANGCI_LINT_VERSION: 'v2.1.6'
-  TRIVY_VERSION: '0.63.0'
+  GOLANGCI_LINT_VERSION: 'v2.5.0'
+  TRIVY_VERSION: '0.67.2'
   GOVULNCHECK_VERSION: 'v1.1.4'
 
 jobs:
@@ -67,7 +67,7 @@ jobs:
     strategy:
       matrix:
         modules: ${{ fromJSON(needs.detect-modules.outputs.modules) }}
-        go-version: [ 1.24.4 ]
+        go-version: [ 1.25.2 ]
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0

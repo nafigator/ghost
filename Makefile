@@ -79,11 +79,11 @@ $(shell test -d $(HOME)/.config || mkdir -p $(HOME)/.config)
 export BUILD_TIME:=$(shell date +'%F %T %Z')
 
 export DOCKER_MOUNT_POINT:=/go/src/github.com/nafigator/$(PROJECT)
-export GO_IMAGE:=nafigat0r/go:1.24.4
-export LINTER_IMAGE:=nafigat0r/golangci-lint:2.1.6
-export TRIVY_IMAGE:=aquasec/trivy:0.63.0
+export GO_IMAGE:=nafigat0r/go:1.25.2
+export LINTER_IMAGE:=nafigat0r/golangci-lint:2.5.0
+export TRIVY_IMAGE:=aquasec/trivy:0.67.2
 export GOVULNCHECK_IMAGE:=nafigat0r/govulncheck:1.1.4
-export SEMGREP_IMAGE:=semgrep/semgrep:1.125.0
+export SEMGREP_IMAGE:=semgrep/semgrep:1.141.0
 export LD_FLAGS:='-s -w \
 	-extldflags=-static \
 	-X "github.com/nafigator/ghost/internal/app.build=$(PROJECT_VERSION), rev.$(CURRENT_BRANCH)/$(PROJECT_REVISION), build time: $(BUILD_TIME)"'
