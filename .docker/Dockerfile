@@ -2,7 +2,7 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM nafigat0r/go:1.24.4 AS builder
+FROM nafigat0r/go:1.25.5 AS builder
 
 ARG LD_FLAGS
 # https://stackoverflow.com/questions/50126741/how-to-remove-intermediate-images-from-a-build-after-the-build
