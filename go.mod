@@ -1,6 +1,6 @@
 module github.com/nafigator/ghost
 
-go 1.24.4
+go 1.25.5
 
 require (
 	github.com/ardanlabs/conf/v3 v3.9.0
