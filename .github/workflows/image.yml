@@ -73,7 +73,7 @@ jobs:
       - name: Crane setup
         uses: imjasonh/setup-crane@31b88efe9de28ae0ffa220711af4b60be9435f6e # v0.4
         with:
-          version: v0.20.5
+          version: v0.20.7
 
       - name: Annotate
         run: |
