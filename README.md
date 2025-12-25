@@ -11,6 +11,7 @@ GHOST creates in working dir fully functional microservice with basic functional
 - Kubernetes livecycle compatible health checks
 - Log level changing by HTTP-request
 - Easy configurable logs (plain text|JSON)
+- Mask sensitive config data in logs
 - Graceful shutdown
 
 ## Usage
