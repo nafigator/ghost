@@ -19,7 +19,7 @@ func generate(c *config.Conf) error {
 	var err error
 	var tpl *template.Template
 
-	vars := map[string]interface{}{
+	vars := map[string]any{
 		"GoModule":         c.ModuleName,
 		"Name":             c.Name,
 		"Description":      c.Description,

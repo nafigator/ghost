@@ -1,14 +1,14 @@
 # This file is licensed under the terms of the MIT license https://opensource.org/license/mit
-# Copyright (c) 2021-2025 Marat Reymers
+# Copyright (c) 2021-2025 Marat Reimers
 
-## Golden config for golangci-lint v2.5.0
+## Golden config for golangci-lint v2.9.0
 #
 # This is the best config for golangci-lint based on my experience and opinion.
 # It is very strict, but not extremely strict.
 # Feel free to adapt it to suit your needs.
-# If this config helps you, please consider keeping a link to this file (see the next comment).
+# If this config helps you, please consider keeping a link to this repo (see the next comment).
 
-# Based on https://gist.github.com/maratori/47a4d00457a92aa426dbd48a18776322/17c4bc7f3bdbe8c3b89d0ac5c034b5533037743d
+# Based on https://github.com/maratori/golangci-lint-config
 
 version: "2"
 
@@ -55,6 +55,7 @@ linters:
     - depguard # checks if package imports are in a list of acceptable packages
     - dupl # tool for code clone detection
     - durationcheck # checks for two durations multiplied together
+    - embeddedstructfieldcheck # checks embedded types in structs
     - errcheck # checking for unchecked errors, these unchecked errors can be critical bugs in some cases
     - errname # checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error
     - errorlint # finds code that will cause problems with the error wrapping scheme introduced in Go 1.13
@@ -86,6 +87,7 @@ linters:
     - makezero # finds slice declarations with non-zero initial length
     - mirror # reports wrong mirror patterns of bytes/strings usage
     - mnd # detects magic numbers
+    - modernize # suggests simplifications to Go code, using modern language and library features
     - musttag # enforces field tags in (un)marshaled structs
     - nakedret # finds naked returns in functions greater than a specified function length
     - nestif # reports deeply nested if statements
@@ -110,6 +112,7 @@ linters:
     - staticcheck # is a go vet on steroids, applying a ton of static analysis checks
     - testableexamples # checks if examples are testable (have an expected output)
     - testifylint # checks usage of github.com/stretchr/testify
+    #- testpackage # makes you use a separate _test package
     - tparallel # detects inappropriate usage of t.Parallel() method in your Go test codes
     - unconvert # removes unnecessary type conversions
     - unparam # reports unused function parameters
@@ -124,7 +127,6 @@ linters:
     #- arangolint # opinionated best practices for arangodb client
     #- decorder # checks declaration order and count of types, constants, variables and functions
     #- exhaustruct # [highly recommend to enable] checks if all structure fields are initialized
-    #- embeddedstructfieldcheck # checks embedded types in structs
     #- ginkgolinter # [if you use ginkgo/gomega] enforces standards of using ginkgo and gomega
     #- godox # detects usage of FIXME, TODO and other keywords inside comments
     #- goheader # checks is file header matches to pattern
@@ -134,7 +136,6 @@ linters:
     #- noinlineerr # disallows inline error handling `if err := ...; err != nil {`
     #- prealloc # [premature optimization, but can be used in some cases] finds slice declarations that could potentially be preallocated
     #- tagalign # checks that struct tags are well aligned
-    #- testpackage # makes you use a separate _test package
     #- varnamelen # [great idea, but too many false positives] checks that the length of a variable's name matches its scope
     #- wrapcheck # checks that errors returned from external packages are wrapped
     #- zerologlint # detects the wrong usage of zerolog that a user forgets to dispatch zerolog.Event
@@ -320,6 +321,9 @@ linters:
         # Assert no unused link in godocs.
         # https://github.com/godoc-lint/godoc-lint?tab=readme-ov-file#no-unused-link
         - no-unused-link
+        # Require proper doc links to standard library declarations where applicable.
+        # https://github.com/godoc-lint/godoc-lint?tab=readme-ov-file#require-stdlib-doclink
+        - require-stdlib-doclink
 
     govet:
       # Enable all analyzers.
@@ -459,3 +463,4 @@ linters:
           - gosec
           - noctx
           - wrapcheck
+          - nolintlint
