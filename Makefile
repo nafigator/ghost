@@ -172,6 +172,7 @@ image: #? Build docker image
 	$(info Build docker image...)
 	@DOCKER_BUILDKIT=1 docker build \
 		--progress=plain \
+		--platform linux/amd64 \
 		--force-rm \
 		--no-cache \
 		--build-arg LD_FLAGS=$(LD_FLAGS) \
