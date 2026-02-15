@@ -6,7 +6,7 @@ export GID:=$(shell id -g)
 export PROJECT:=ghost
 
 ifndef PROJECT_VERSION
-	PROJECT_VERSION:=$(shell git tag -l | tail -n 1)
+	PROJECT_VERSION:=$(shell git tag -l --sort=v:refname | tail -n 1)
 
 	# If project haven't any tags
 	ifeq ($(PROJECT_VERSION),)
