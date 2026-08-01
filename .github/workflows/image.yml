@@ -1,9 +1,5 @@
 name: Image
 
-permissions:
-  contents: write
-  security-events: write
-
 on:
   workflow_dispatch:
 
@@ -18,14 +14,17 @@ jobs:
   docker:
     name: Create image
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      security-events: write
     environment: production
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: '0'
 
       - name: Login to Docker Hub
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 #v3.4.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f #v4.6.0
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
@@ -46,7 +45,7 @@ jobs:
           echo "BUILD_TIME=$(docker inspect ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }} | grep -oP '(?<=Created\": \")[^\"]*')" >> $GITHUB_ENV
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37 #v0.31.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
           image-ref: ${{ env.IMAGE_REF }}:latest
           format: sarif
@@ -57,7 +56,7 @@ jobs:
 
       - name: Upload trivy SARIF file
         if: always()
-        uses: github/codeql-action/upload-sarif@39edc492dbe16b1465b0cafca41432d857bdb31a # v3.29.1
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.27.3
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: trivy-results.sarif
@@ -71,9 +70,9 @@ jobs:
           docker push ${{ env.IMAGE_REF }}:latest
 
       - name: Crane setup
-        uses: imjasonh/setup-crane@6da1ae018866400525525ce74ff892880c099987 # v0.5
+        uses: imjasonh/setup-crane@feee3b6bb0d4c68370f256a4502498c9227e5c6b # v0.7
         with:
-          version: v0.20.7
+          version: v0.21.7
 
       - name: Annotate
         run: |

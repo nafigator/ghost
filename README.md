@@ -8,7 +8,7 @@ GHOST creates in working dir fully functional microservice with basic functional
 - Ready to use Makefile with help target
 - Ready to use docker-compose with override template
 - Ready to use security checks by trivy, semgrep and govulncheck
-- Kubernetes livecycle compatible health checks
+- Kubernetes lifecycle compatible health checks
 - Log level changing by HTTP-request
 - Easy configurable logs (plain text|JSON)
 - Mask sensitive config data in logs
