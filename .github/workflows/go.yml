@@ -15,8 +15,7 @@ on:
     - cron: '29 6 * * *'
 
 env:
-  GOLANGCI_LINT_VERSION: 'v2.9.0'
-  TRIVY_VERSION: '0.67.2'
+  GOLANGCI_LINT_VERSION: 'v2.12.2'
 
 jobs:
   spelling:
