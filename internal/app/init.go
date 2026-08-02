@@ -207,8 +207,8 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  httpMuxSrc,
 			inc:  []string{withREST},
 		},
-		"build": {
-			dir:  "internal/app/http/handlers/support",
+		"build": { //nolint:goconst	// Don't change for readability.
+			dir:  "internal/app/http/handlers/support", //nolint:goconst	// Don't change for readability.
 			file: "internal/app/http/handlers/support/build.go",
 			src:  buildSrc,
 		},
@@ -253,7 +253,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  readinessSocketSrc,
 		},
 		"middleware": {
-			dir:  "internal/sdk/http/mux",
+			dir:  "internal/sdk/http/mux", //nolint:goconst	// Don't change for readability.
 			file: "internal/sdk/http/mux/middleware.go",
 			src:  middlewareSrc,
 		},

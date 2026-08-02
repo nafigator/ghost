@@ -1,12 +1,12 @@
 module github.com/nafigator/ghost
 
-go 1.25.5
+go 1.26.0
 
 require (
-	github.com/ardanlabs/conf/v3 v3.10.0
-	github.com/nafigator/zapper v1.0.13
-	github.com/nafigator/zapper/conf v1.1.12
-	go.uber.org/zap v1.27.1
+	github.com/ardanlabs/conf/v3 v3.13.0
+	github.com/nafigator/zapper v1.0.14
+	github.com/nafigator/zapper/conf v1.1.13
+	go.uber.org/zap v1.28.0
 )
 
 require (

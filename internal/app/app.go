@@ -15,14 +15,14 @@ const (
 	shutdownMsg = "ghost shutdown"
 )
 
-var build = "develop" //nolint:gochecknoglobals //build-flag
+var buildInfo = "develop" //nolint:gochecknoglobals //build-flag
 
 // Run runs application.
 func Run(log *zap.SugaredLogger) error {
 	var c *config.Conf
 	var err error
 
-	if c, err = config.Init(build, log); err != nil {
+	if c, err = config.Init(buildInfo, log); err != nil {
 		return err
 	}
 
