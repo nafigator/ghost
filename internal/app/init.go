@@ -154,7 +154,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			inc:  []string{withREST},
 		},
 		"compose-override-dist": {
-			dir:  "build",
+			dir:  "build", //nolint:goconst	// Don't change for readability.
 			file: "build/docker-compose.override.dist.yml",
 			src:  composeOverrideSrc,
 			inc:  []string{withREST},
@@ -207,7 +207,7 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  httpMuxSrc,
 			inc:  []string{withREST},
 		},
-		"build": { //nolint:goconst	// Don't change for readability.
+		"build": {
 			dir:  "internal/app/http/handlers/support", //nolint:goconst	// Don't change for readability.
 			file: "internal/app/http/handlers/support/build.go",
 			src:  buildSrc,

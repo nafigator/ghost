@@ -79,8 +79,8 @@ $(shell test -d $(HOME)/.config || mkdir -p $(HOME)/.config)
 export BUILD_TIME:=$(shell date +'%F %T %Z')
 
 export DOCKER_MOUNT_POINT:=/opt/$(PROJECT)
-export GO_IMAGE:=nafigat0r/go:1.26.5
-export LINTER_IMAGE:=nafigat0r/golangci-lint:2.12.2
+export GO_IMAGE:=nafigat0r/go:1.27.0
+export LINTER_IMAGE:=nafigat0r/golangci-lint:2.13.1
 export TRIVY_IMAGE:=aquasec/trivy:0.72.0
 export GOVULNCHECK_IMAGE:=nafigat0r/govulncheck:1.6.0
 export SEMGREP_IMAGE:=semgrep/semgrep:1.172.0
