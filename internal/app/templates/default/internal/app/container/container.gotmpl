@@ -3,6 +3,7 @@ package container
 
 import (
 	"context"
+	"sync/atomic"
 
 	"go.uber.org/zap"
 
@@ -22,7 +23,7 @@ type Container struct {
 	Log      *zap.SugaredLogger
 	LogConf  *zap.Config
 	Closers  map[string]closer
-	ReadyAll bool
+	ReadyAll atomic.Bool
 }
 
 // New creates new dependency injection container.

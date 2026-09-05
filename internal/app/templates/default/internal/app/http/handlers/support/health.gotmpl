@@ -28,7 +28,7 @@ func (h *Handler) Startup(*http.Request, any) mux.Response {
 
 // Readiness implements readiness probe logic.
 func (h *Handler) Readiness(*http.Request, any) mux.Response {
-	if h.ReadyAll {
+	if h.ReadyAll.Load() {
 		return new(response.Ok)
 	}
 

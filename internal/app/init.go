@@ -96,10 +96,10 @@ var (
 	//go:embed templates/default/internal/app/http/validators/validators.gotmpl
 	validatorsSrc string
 
-	//go:embed templates/default/internal/app/readiness/readiness.gotmpl
+	//go:embed templates/default/internal/sdk/readiness/readiness.gotmpl
 	readinessSrc string
 
-	//go:embed templates/rest/default/internal/app/readiness/readiness.gotmpl
+	//go:embed templates/rest/default/internal/sdk/readiness/readiness.gotmpl
 	restReadinessSrc string
 
 	//go:embed templates/default/internal/app/http/errors/errors.gotmpl
@@ -160,8 +160,8 @@ func templates(c *config.Conf) tps {
 		}
 
 		t["readiness"] = tp{
-			dir:  "internal/app/readiness",
-			file: "internal/app/readiness/readiness.go",
+			dir:  "internal/sdk/readiness",
+			file: "internal/sdk/readiness/readiness.go",
 			src:  restReadinessSrc,
 		}
 
@@ -291,8 +291,8 @@ func common() tps { //nolint:funlen  // This function supposed to be longer than
 			src:  errorsSrc,
 		},
 		"readiness": {
-			dir:  "internal/app/readiness",
-			file: "internal/app/readiness/readiness.go",
+			dir:  "internal/sdk/readiness",
+			file: "internal/sdk/readiness/readiness.go",
 			src:  readinessSrc,
 		},
 		"socket": {

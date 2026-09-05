@@ -1,24 +1,25 @@
 // Package readiness contains readiness check functionality.
 package readiness
 
+import (
+	"sync/atomic"
+)
+
 const (
-	// Resources is count of resources needed to check readiness.
+	// Resources is a count of resources needed to check readiness.
 	// Increase this value if you are expecting ready status from other resources.
-	Resources = 2
+	Resources = 2 // HTTP aux socket, HTTP server socket.
 )
 
 // Check waits data from ready channel and checks if all resources ready when received.
-func Check(ready chan struct{}, readyAll *bool) {
+func Check(flag *atomic.Bool, ready chan struct{}) {
 	var count int
 
 	for range ready {
 		count++
 
 		if count == Resources {
-			*readyAll = true
-
-			// If some resources try to write into closed channel this will cause panic.
-			close(ready)
+			flag.Store(true)
 
 			return
 		}
