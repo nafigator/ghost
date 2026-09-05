@@ -1,0 +1,26 @@
+// Package readiness contains readiness check functionality.
+package readiness
+
+const (
+	// Resources is count of resources needed to check readiness.
+	// Increase this value if you are expecting ready status from other resources.
+	Resources = 1
+)
+
+// Check waits data from ready channel and checks if all resources ready when received.
+func Check(ready chan struct{}, readyAll *bool) {
+	var count int
+
+	for range ready {
+		count++
+
+		if count == Resources {
+			*readyAll = true
+
+			// If some resources try to write into closed channel this will cause panic.
+			close(ready)
+
+			return
+		}
+	}
+}

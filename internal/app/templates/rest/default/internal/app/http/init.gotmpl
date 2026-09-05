@@ -15,20 +15,17 @@ import (
 )
 
 const (
-	{{- if .WithREST }}
-		{{- template "InitConstRest" . }}
-	{{- else -}}
-		{{- template "InitConstOrig" . }}
-	{{- end }}
+	aux  = "Aux HTTP server"
+	rest = "REST HTTP server"
 )
 
 // Init initializes HTTP servers.
 func Init(ctx context.Context, ready chan struct{}, di *container.Container, srvErrors chan<- error) {
 	go socket.Wait(ctx, ready, di.Conf.AuxSocket, di.Log)
-	{{- if .WithREST }}{{ template "InitWaitForSrvSocket" . }}{{ end }}
+	go socket.Wait(ctx, ready, di.Conf.SrvSocket, di.Log)
 
 	startAuxServer(ctx, di, srvErrors)
-	{{- if .WithREST }}{{ template "InitStartServerCall" . }}{{ end }}
+	startServer(ctx, di, srvErrors)
 }
 
 func startAuxServer(ctx context.Context, di *container.Container, srvErrors chan<- error) {
@@ -51,4 +48,24 @@ func startAuxServer(ctx context.Context, di *container.Container, srvErrors chan
 
 	di.Closers[aux] = &srv
 }
-{{ if .WithREST }}{{ template "InitStartServer" . }}{{ end -}}
+
+func startServer(ctx context.Context, di *container.Container, srvErrors chan<- error) {
+	srv := http.Server{
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+		Addr:         di.Conf.SrvSocket,
+		Handler:      srvMux(di),
+		ReadTimeout:  di.Conf.ReadTimeout,
+		WriteTimeout: di.Conf.WriteTimeout,
+		ErrorLog:     log.New(writer.New(di.Log), "", 0),
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			srvErrors <- err
+		}
+	}()
+
+	di.Closers[rest] = &srv
+}

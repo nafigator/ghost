@@ -4,7 +4,7 @@ package readiness
 const (
 	// Resources is count of resources needed to check readiness.
 	// Increase this value if you are expecting ready status from other resources.
-	Resources = {{ if .WithREST -}} 2 {{- else -}} 1 {{- end }}
+	Resources = 2
 )
 
 // Check waits data from ready channel and checks if all resources ready when received.

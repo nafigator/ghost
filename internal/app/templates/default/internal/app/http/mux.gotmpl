@@ -7,7 +7,6 @@ import (
 	"github.com/nafigator/http/storage/debug"
 
 	"{{ lower .GoModule }}/internal/app/container"
-	{{- if .WithREST }}{{ template "MuxImportApi" . }}{{ end }}
 	"{{ lower .GoModule }}/internal/app/http/handlers/support"
 	"{{ lower .GoModule }}/internal/app/http/validators"
 	"{{ lower .GoModule }}/internal/sdk/http/mux"
@@ -32,4 +31,3 @@ func auxMux(di *container.Container) http.Handler {
 
 	return m
 }
-{{ if .WithREST }}{{- template "MuxSrvMux" . }}{{ end -}}

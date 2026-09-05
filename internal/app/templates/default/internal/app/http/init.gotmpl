@@ -1,0 +1,47 @@
+// Package http provides initialization for HTTP components.
+package http
+
+import (
+	"context"
+	"errors"
+	"log" //nolint:depguard // Log errors through wrapper with zap log
+	"net"
+	"net/http"
+
+	"github.com/nafigator/zapper/writer"
+
+	"{{ lower .GoModule }}/internal/app/container"
+	"{{ lower .GoModule }}/internal/sdk/readiness/socket"
+)
+
+const (
+	aux = "Aux HTTP server"
+)
+
+// Init initializes HTTP servers.
+func Init(ctx context.Context, ready chan struct{}, di *container.Container, srvErrors chan<- error) {
+	go socket.Wait(ctx, ready, di.Conf.AuxSocket, di.Log)
+
+	startAuxServer(ctx, di, srvErrors)
+}
+
+func startAuxServer(ctx context.Context, di *container.Container, srvErrors chan<- error) {
+	srv := http.Server{
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+		Addr:         di.Conf.AuxSocket,
+		Handler:      auxMux(di),
+		ReadTimeout:  di.Conf.ReadTimeout,
+		WriteTimeout: di.Conf.WriteTimeout,
+		ErrorLog:     log.New(writer.New(di.Log), "", 0),
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			srvErrors <- err
+		}
+	}()
+
+	di.Closers[aux] = &srv
+}
