@@ -17,6 +17,7 @@ const (
 func generate(c *config.Conf) error {
 	var f *os.File
 	var err error
+	var tt tps
 	var tpl *template.Template
 
 	vars := map[string]any{
@@ -34,7 +35,12 @@ func generate(c *config.Conf) error {
 		"upper": strings.ToUpper,
 	}
 
-	for name, t := range templates(c) {
+	tt, err = templates(c)
+	if err != nil {
+		return err
+	}
+
+	for name, t := range tt {
 		if err = createDir(t.dir); err != nil {
 			return err
 		}
