@@ -4,10 +4,11 @@ package config
 import (
 	"errors"
 	"fmt"
+	"io/fs"
+	"os"
 	"time"
 
 	"github.com/ardanlabs/conf/v3"
-	"go.uber.org/zap"
 )
 
 const (
@@ -15,9 +16,15 @@ const (
 	cfgPrefix = "GHOST"
 )
 
-type Conf struct {
+type logger interface {
+	Infof(format string, args ...any)
+}
+
+type Conf struct { //nolint:govet // Acknowledged
+	conf.Args
 	conf.Version
 
+	OutputDir        string        `conf:"-"`
 	Name             string        `conf:"default:test,short:n,help:Project short name"`
 	Description      string        `conf:"default:Go microservice,short:d,help:Project short description"`
 	ModuleName       string        `conf:"default:github.com/test/test,short:m,help:Go module name"`
@@ -28,7 +35,11 @@ type Conf struct {
 	WithREST         bool          `conf:"default:false,short:r,help:Add HTTP server with REST API functionality"`
 }
 
-func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
+// ErrInfo is returned when the user requested informational output
+// (help, version) and the application should exit without error.
+var ErrInfo = errors.New("info wanted")
+
+func Init(build string, log logger) (*Conf, error) {
 	var c string
 	var err error
 
@@ -40,10 +51,16 @@ func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
 	}
 
 	if c, err = conf.Parse(cfgPrefix, &cfg); err != nil {
-		if errors.Is(err, conf.ErrHelpWanted) {
+		if errors.Is(err, conf.ErrHelpWanted) || errors.Is(err, conf.ErrVersionWanted) {
 			fmt.Println(c) //nolint:forbidigo // Need for raw output of help message
+
+			return nil, ErrInfo
 		}
 
+		return nil, err
+	}
+
+	if err = resolveOutputDir(&cfg); err != nil {
 		return nil, err
 	}
 
@@ -54,4 +71,21 @@ func Init(build string, log *zap.SugaredLogger) (*Conf, error) {
 	log.Infof("Initial config:\n%s", c)
 
 	return &cfg, nil
+}
+
+func resolveOutputDir(cfg *Conf) error {
+	cfg.OutputDir = cfg.Num(0)
+	if cfg.OutputDir == "" {
+		return errors.New("output directory not specified")
+	}
+
+	if d, err := os.Stat(cfg.OutputDir); err == nil {
+		if !d.IsDir() {
+			return fmt.Errorf("output dir %q exists and is not a directory", cfg.OutputDir)
+		}
+	} else if !errors.Is(err, fs.ErrNotExist) {
+		return fmt.Errorf("stat %s: %w", cfg.OutputDir, err)
+	}
+
+	return nil
 }

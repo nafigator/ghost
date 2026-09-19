@@ -15,14 +15,17 @@ const (
 	shutdownMsg = "ghost shutdown"
 )
 
-var buildInfo = "develop" //nolint:gochecknoglobals //build-flag
+var (
+	buildInfo = "develop" //nolint:gochecknoglobals //build-flag
+	// ErrInfo signals that the application has output requested information
+	// (help, version) and should exit successfully.
+	ErrInfo = config.ErrInfo
+)
 
 // Run runs application.
 func Run(log *zap.SugaredLogger) error {
-	var c *config.Conf
-	var err error
-
-	if c, err = config.Init(buildInfo, log); err != nil {
+	c, err := config.Init(buildInfo, log)
+	if err != nil {
 		return err
 	}
 

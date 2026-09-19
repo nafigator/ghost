@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -37,7 +38,7 @@ func generate(c *config.Conf) error {
 	}
 
 	for _, t := range tt {
-		if err = write(t, fn, vars); err != nil {
+		if err = write(c.OutputDir, t, fn, vars); err != nil {
 			return err
 		}
 	}
@@ -57,23 +58,23 @@ func createDir(d string) error {
 	return nil
 }
 
-func write(t tp, fn template.FuncMap, vars map[string]any) error {
-	if err := createDir(t.dir); err != nil {
+func write(target string, t tp, fn template.FuncMap, vars map[string]any) error {
+	if err := createDir(filepath.Join(target, t.dir)); err != nil {
 		return err
 	}
 
-	tpl, err := template.New(t.file).Funcs(fn).Parse(t.src)
+	tpl, err := template.New(t.path).Funcs(fn).Parse(t.src)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse %s: %w", t.path, err)
 	}
 
 	var buf bytes.Buffer
 	if err = tpl.Execute(&buf, vars); err != nil {
-		return fmt.Errorf("execute %s: %w", t.file, err)
+		return fmt.Errorf("execute %s: %w", t.path, err)
 	}
 
-	if err = os.WriteFile(t.file, buf.Bytes(), fileStrictMode); err != nil {
-		return fmt.Errorf("write %s: %w", t.file, err)
+	if err = os.WriteFile(filepath.Join(target, t.path), buf.Bytes(), fileStrictMode); err != nil {
+		return fmt.Errorf("write %s: %w", t.path, err)
 	}
 
 	return nil

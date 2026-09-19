@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/fs"
 
-	c "github.com/ardanlabs/conf/v3"
 	"github.com/nafigator/zapper"
 	"github.com/nafigator/zapper/conf"
 	"go.uber.org/zap"
@@ -17,7 +16,7 @@ func main() {
 	defer sync(log)
 
 	if err := app.Run(log); err != nil {
-		if errors.Is(err, c.ErrHelpWanted) {
+		if errors.Is(err, app.ErrInfo) {
 			return
 		}
 

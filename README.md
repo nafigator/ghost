@@ -3,7 +3,7 @@
 
 Go High-level Open Service Templater
 
-GHOST creates in working dir fully functional microservice with basic functionality:
+GHOST creates in output dir fully functional microservice code with basic functionality:
 
 - Ready to use Makefile with help target
 - Ready to use docker-compose with override template
@@ -16,19 +16,22 @@ GHOST creates in working dir fully functional microservice with basic functional
 
 ## Usage
 
+> [!NOTE]
+> Output directory (relative or absolute). Files will be created at paths relative to this directory. Existing files at target paths will be overwritten.
+
 <details>
-  <summary>Example</summary>
+  <summary>Help</summary>
 
 ```shell
 $ ghost -h
-Usage: ghost [options...]
+Usage: ghost [options...] [arguments...]
 
 OPTIONS
   -d, --description        <string>    (default: Go microservice)                Project short description
-  -g, --go-image           <string>    (default: nafigat0r/go:1.24.4)            Go docker image
+  -g, --go-image           <string>    (default: nafigat0r/go:1.26.0)            Go docker image
   -c, --govulncheck-image  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
   -h, --help                                                                     display this help message
-  -l, --linter-image       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
+  -l, --linter-image       <string>    (default: nafigat0r/golangci-lint:2.9.0)  Linter docker image
   -m, --module-name        <string>    (default: github.com/test/test)           Go module name
   -n, --name               <string>    (default: test)                           Project short name
   -t, --shutdown-timeout   <duration>  (default: 10s)                            Timeout for graceful shutdown
@@ -37,13 +40,35 @@ OPTIONS
 
 ENVIRONMENT
   GHOST_DESCRIPTION        <string>    (default: Go microservice)                Project short description
-  GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.24.4)            Go docker image
+  GHOST_GO_IMAGE           <string>    (default: nafigat0r/go:1.26.0)            Go docker image
   GHOST_GOVULNCHECK_IMAGE  <string>    (default: nafigat0r/govulncheck:1.1.4)    Govulncheck docker image
-  GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.1.6)  Linter docker image
+  GHOST_LINTER_IMAGE       <string>    (default: nafigat0r/golangci-lint:2.9.0)  Linter docker image
   GHOST_MODULE_NAME        <string>    (default: github.com/test/test)           Go module name
   GHOST_NAME               <string>    (default: test)                           Project short name
   GHOST_SHUTDOWN_TIMEOUT   <duration>  (default: 10s)                            Timeout for graceful shutdown
   GHOST_WITH_REST          <bool>      (default: false)                          Add HTTP server with REST API functionality
+```
+</details>
+
+<details>
+  <summary>Create REST microservice in <b>dir</b></summary>
+
+```shell
+$ ghost -r dir
+2026-09-19 15:26:46.005	INFO	config/config.go:60	Initial config:
+    --args=[dir]
+    --build=develop
+    --desc=GHOST (Go High-level Open Service Templater)
+    --description=Go microservice
+    --go-image=nafigat0r/go:1.26.0
+    --govulncheck-image=nafigat0r/govulncheck:1.1.4
+    --linter-image=nafigat0r/golangci-lint:2.9.0
+    --module-name=github.com/test/test
+    --name=test
+    --shutdown-timeout=10s
+    --with-rest=true
+2026-09-19 15:26:46.005	INFO	app/app.go:33	ghost start
+2026-09-19 15:26:46.007	INFO	app/app.go:40	ghost shutdown
 ```
 </details>
 

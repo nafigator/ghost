@@ -12,7 +12,7 @@ import (
 
 type tp struct {
 	dir  string
-	file string
+	path string
 	src  string
 }
 
@@ -28,7 +28,7 @@ func transformName(name string) string {
 	return name
 }
 
-var rename = map[string]string{ //nolint: gochecknoglobals // Acknowledged
+var rename = map[string]string{ //nolint:gochecknoglobals // Acknowledged
 	"makefile.gotmpl":               "Makefile",
 	"gomod.gotmpl":                  "go.mod",
 	"gosum.gotmpl":                  "go.sum",
@@ -93,7 +93,7 @@ func load(tt tps, rfs fs.FS) (tps, error) {
 
 		t := tp{
 			dir:  filepath.Dir(out),
-			file: out,
+			path: out,
 			src:  string(b),
 		}
 
