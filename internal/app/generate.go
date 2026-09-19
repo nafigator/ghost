@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"text/template"
@@ -16,9 +17,6 @@ const (
 
 // generate service code from templates.
 func generate(c *config.Conf) error {
-	var err error
-	var tt tps
-
 	vars := map[string]any{
 		"GoModule":         c.ModuleName,
 		"Name":             c.Name,
@@ -33,7 +31,7 @@ func generate(c *config.Conf) error {
 		"upper": strings.ToUpper,
 	}
 
-	tt, err = templates(c)
+	tt, err := templates(c)
 	if err != nil {
 		return err
 	}
@@ -52,7 +50,7 @@ func createDir(d string) error {
 		return nil
 	}
 
-	if err := os.MkdirAll(d, os.FileMode(dirStrictMode)); err != nil {
+	if err := os.MkdirAll(d, dirStrictMode); err != nil {
 		return err
 	}
 
@@ -60,32 +58,23 @@ func createDir(d string) error {
 }
 
 func write(t tp, fn template.FuncMap, vars map[string]any) error {
-	var err error
-	var f *os.File
-	var tpl *template.Template
-
-	if err = createDir(t.dir); err != nil {
+	if err := createDir(t.dir); err != nil {
 		return err
 	}
 
-	tpl, err = template.New(t.file).Funcs(fn).Parse(t.src)
+	tpl, err := template.New(t.file).Funcs(fn).Parse(t.src)
 	if err != nil {
 		return err
 	}
 
-	f, err = os.OpenFile(t.file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(fileStrictMode))
-	if err != nil {
-		return err
-	}
-	defer func(f *os.File) {
-		_ = f.Close()
-	}(f)
-
-	// For atomic operation write to buffer at first.
 	var buf bytes.Buffer
 	if err = tpl.Execute(&buf, vars); err != nil {
-		return err
+		return fmt.Errorf("execute %s: %w", t.file, err)
 	}
 
-	return os.WriteFile(t.file, buf.Bytes(), os.FileMode(fileStrictMode))
+	if err = os.WriteFile(t.file, buf.Bytes(), fileStrictMode); err != nil {
+		return fmt.Errorf("write %s: %w", t.file, err)
+	}
+
+	return nil
 }

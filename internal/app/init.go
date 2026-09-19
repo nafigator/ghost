@@ -48,10 +48,9 @@ var (
 )
 
 func templates(c *config.Conf) (tps, error) {
-	var err error
 	tt := make(tps)
 
-	tt, err = sources(tt, commonFS, "templates/common")
+	tt, err := sources(tt, commonFS, "templates/common")
 	if err != nil {
 		return nil, err
 	}
@@ -66,16 +65,16 @@ func templates(c *config.Conf) (tps, error) {
 	return tt, nil
 }
 
-func sources(tps tps, f embed.FS, trimPath string) (tps, error) {
+func sources(tt tps, f embed.FS, trimPath string) (tps, error) {
 	sfs, err := fs.Sub(f, trimPath)
 	if err != nil {
 		return nil, err
 	}
 
-	return load(tps, sfs)
+	return load(tt, sfs)
 }
 
-func load(tps tps, rfs fs.FS) (tps, error) {
+func load(tt tps, rfs fs.FS) (tps, error) {
 	err := fs.WalkDir(rfs, ".", func(p string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -90,7 +89,7 @@ func load(tps tps, rfs fs.FS) (tps, error) {
 			return fmt.Errorf("read %s: %w", p, rErr)
 		}
 
-		out := transformName(p)
+		out := filepath.FromSlash(transformName(p))
 
 		t := tp{
 			dir:  filepath.Dir(out),
@@ -98,7 +97,7 @@ func load(tps tps, rfs fs.FS) (tps, error) {
 			src:  string(b),
 		}
 
-		tps[out] = t
+		tt[out] = t
 
 		return nil
 	})
@@ -106,5 +105,5 @@ func load(tps tps, rfs fs.FS) (tps, error) {
 		return nil, err
 	}
 
-	return tps, nil
+	return tt, nil
 }
