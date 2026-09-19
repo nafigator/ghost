@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"os"
 	"strings"
 	"text/template"
@@ -15,10 +16,8 @@ const (
 
 // generate service code from templates.
 func generate(c *config.Conf) error {
-	var f *os.File
 	var err error
 	var tt tps
-	var tpl *template.Template
 
 	vars := map[string]any{
 		"GoModule":         c.ModuleName,
@@ -27,7 +26,6 @@ func generate(c *config.Conf) error {
 		"GoImage":          c.GoImage,
 		"GovulncheckImage": c.GovulncheckImage,
 		"LinterImage":      c.LinterImage,
-		"WithREST":         c.WithREST,
 	}
 
 	fn := template.FuncMap{
@@ -40,20 +38,8 @@ func generate(c *config.Conf) error {
 		return err
 	}
 
-	for name, t := range tt {
-		if err = createDir(t.dir); err != nil {
-			return err
-		}
-
-		if tpl, err = template.New(name).Funcs(fn).Parse(t.src); err != nil {
-			return err
-		}
-
-		if f, err = os.OpenFile(t.file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(fileStrictMode)); err != nil {
-			return err
-		}
-
-		if err = tpl.Execute(f, vars); err != nil {
+	for _, t := range tt {
+		if err = write(t, fn, vars); err != nil {
 			return err
 		}
 	}
@@ -71,4 +57,35 @@ func createDir(d string) error {
 	}
 
 	return nil
+}
+
+func write(t tp, fn template.FuncMap, vars map[string]any) error {
+	var err error
+	var f *os.File
+	var tpl *template.Template
+
+	if err = createDir(t.dir); err != nil {
+		return err
+	}
+
+	tpl, err = template.New(t.file).Funcs(fn).Parse(t.src)
+	if err != nil {
+		return err
+	}
+
+	f, err = os.OpenFile(t.file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.FileMode(fileStrictMode))
+	if err != nil {
+		return err
+	}
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
+
+	// For atomic operation write to buffer at first.
+	var buf bytes.Buffer
+	if err = tpl.Execute(&buf, vars); err != nil {
+		return err
+	}
+
+	return os.WriteFile(t.file, buf.Bytes(), os.FileMode(fileStrictMode))
 }

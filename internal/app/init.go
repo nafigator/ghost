@@ -98,7 +98,7 @@ func load(tps tps, rfs fs.FS) (tps, error) {
 			src:  string(b),
 		}
 
-		tps[p] = t
+		tps[out] = t
 
 		return nil
 	})
