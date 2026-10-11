@@ -20,7 +20,7 @@ type logger interface {
 	Infof(format string, args ...any)
 }
 
-type Conf struct { //nolint:govet // Acknowledged
+type Conf struct {
 	conf.Args
 	conf.Version
 
