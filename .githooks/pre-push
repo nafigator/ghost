@@ -1,0 +1,39 @@
+#!/bin/bash
+
+download_bash_helpers() {
+	printf "Installing bash-helpers\n"
+	[[ -d /usr/local/lib/bash/includes ]] || sudo mkdir -p /usr/local/lib/bash/includes
+
+	sudo curl -so /usr/local/lib/bash/includes/bash-helpers.sh https://raw.githubusercontent.com/nafigator/bash-helpers/master/src/bash-helpers.sh
+	sudo chmod +x /usr/local/lib/bash/includes/bash-helpers.sh
+
+	return 0
+}
+
+init_bash_helpers() {
+	[[ -e /usr/local/lib/bash/includes/bash-helpers.sh ]] || download_bash_helpers
+
+	if [[ ! -x /usr/local/lib/bash/includes/bash-helpers.sh ]]; then
+		printf "Insufficient permissions for bash-helpers execute\n"; return 1
+	fi
+
+	. /usr/local/lib/bash/includes/bash-helpers.sh
+
+	return 0
+}
+
+init_bash_helpers || exit 1
+
+# shellcheck disable=SC2034
+INTERACTIVE=1
+
+REPO_ROOT=$(git rev-parse --show-toplevel) || exit 1
+
+[[ -f "$REPO_ROOT/.typos.toml" ]] || {
+	error "Typos config not found"
+	exit 1
+}
+
+# check typos
+typos --config "$REPO_ROOT/.typos.toml" "$REPO_ROOT"
+status 'Typos check' $?

@@ -205,6 +205,13 @@ semgrep: #? Security checks by semgrep
 		-w /var/semgrep \
 		$(SEMGREP_IMAGE) semgrep scan --config auto .
 
+.PHONY: hook
+hook: #? Setup git hooks
+	$(info Git hooks setup...)
+	@git config --local core.hooksPath "$(CURDIR)/.githooks"
+	@chmod 0750 -R $(CURDIR)/.githooks/*
+	@echo Setup complete
+
 .PHONY: help
 help: #? Show this message
 	@printf "\033[34;01mApplication management:\033[0m\n"
