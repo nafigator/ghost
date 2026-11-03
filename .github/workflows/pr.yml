@@ -24,7 +24,7 @@ jobs:
       go: ${{ steps.filter.outputs.go }}
     steps:
       # For pull requests it's not necessary checkout the code
-      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 # v4.0.2
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
@@ -96,7 +96,7 @@ jobs:
       - name: Checkout Actions Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Spell Check Repo
-        uses: crate-ci/typos@bee27e3a4fd1ea2111cf90ab89cd076c870fce14 # v1.48.0
+        uses: crate-ci/typos@4c8b7f51ca60df14e3c5ca82770dfbbe6c3dae85 # v1.52.0
 
   commit-me:
     name: Conventional Commits Compliance
@@ -107,7 +107,7 @@ jobs:
       # Enable colored output in GitHub Actions
       FORCE_COLOR: 3
     steps:
-      - uses: dev-build-deploy/commit-me@27d14296ec218488c543616d9128d7e75ab7463a # v1.5.3
+      - uses: dev-build-deploy/commit-me@d514fec15ea83c0643013c801a375893eb51a433 # v2.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}  # Required to retrieve the commits associated with your Pull Request
           include-commits: true  # OPTIONAL; forces the inclusion of commits associated with your Pull Request
@@ -161,7 +161,7 @@ jobs:
 
       - name: Upload SARIF file
         if: always()
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.27.3
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: "${{ matrix.modules }}/results.sarif"
